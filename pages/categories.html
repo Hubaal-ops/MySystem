@@ -38,28 +38,49 @@
 
     <!-- Add Category Dialog -->
     <div class="dialog-overlay" id="addCategoryDialog">
-        <div class="dialog">
+        <div class="dialog dialog-lg">
             <div class="dialog-header">
-                <h2>Add New Category</h2>
+                <h2>New Category</h2>
                 <button class="close-btn" onclick="closeAddCategoryDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
                 <form id="addCategoryForm" onsubmit="handleAddCategory(event)">
-                    <div class="form-group">
-                        <label for="categoryName">Category Name</label>
-                        <input type="text" id="categoryName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="categoryLogo">Category Logo</label>
-                        <div class="file-input">
-                            <input type="file" id="categoryLogo" accept="image/*">
-                            <label for="categoryLogo" class="file-label">
-                                <i class="fas fa-upload"></i> Choose File
-                            </label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoryName">Category Name</label>
+                            <input type="text" id="categoryName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="parentCategory">Parent Category</label>
+                            <select id="parentCategory">
+                                <option value="">None (Top Level)</option>
+                                <option value="1">Electronics</option>
+                                <option value="2">Clothing</option>
+                            </select>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoryImage">Category Image</label>
+                            <input type="file" id="categoryImage" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="dialog-actions">
                         <button type="button" class="btn-secondary" onclick="closeAddCategoryDialog()">Cancel</button>
                         <button type="submit" class="btn-primary">Save Category</button>
@@ -72,7 +93,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dialog functionality
     const dialog = document.getElementById('addCategoryDialog');
     
     window.openAddCategoryDialog = function() {
@@ -81,11 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.closeAddCategoryDialog = function() {
         dialog.classList.remove('active');
+        document.getElementById('addCategoryForm').reset();
     };
 
     window.handleAddCategory = function(event) {
         event.preventDefault();
-        // Handle form submission here
         const formData = new FormData(event.target);
         // Add your logic to save the category
         closeAddCategoryDialog();
@@ -98,4 +118,62 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script> 
+</script>
+
+<style>
+.dialog-lg {
+    max-width: 800px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 8px 0;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background: #6B7280;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #4B5563;
+}
+</style> 

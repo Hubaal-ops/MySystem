@@ -1,0 +1,377 @@
+<div class="employee-container">
+    <div class="page-header">
+        <h1>Employees</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddEmployeeDialog()">
+                <i class="fas fa-user-plus"></i> New Employee
+            </button>
+            <button class="btn-secondary" onclick="openImportDialog()">
+                <i class="fas fa-file-import"></i> Import
+            </button>
+        </div>
+    </div>
+
+    <div class="employee-content">
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Position</th>
+                        <th>Contact</th>
+                        <th>Join Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    <tr>
+                        <td>EMP-001</td>
+                        <td>John Doe</td>
+                        <td>Sales</td>
+                        <td>Sales Manager</td>
+                        <td>+1234567890</td>
+                        <td>2023-01-15</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                        <td>
+                            <div class="action-dropdown">
+                                <button class="btn-icon" onclick="toggleActionMenu(this)">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="action-menu">
+                                    <button onclick="viewEmployee('EMP-001')">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    <button onclick="editEmployee('EMP-001')">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button onclick="toggleEmployeeStatus('EMP-001')">
+                                        <i class="fas fa-user-slash"></i> Deactivate
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Employee Dialog -->
+    <div class="dialog-overlay" id="addEmployeeDialog">
+        <div class="dialog dialog-lg">
+            <div class="dialog-header">
+                <h2>New Employee</h2>
+                <button class="close-btn" onclick="closeAddEmployeeDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="addEmployeeForm" onsubmit="handleAddEmployee(event)">
+                    <!-- Personal Information -->
+                    <h3>Personal Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dateOfBirth">Date of Birth</label>
+                            <input type="date" id="dateOfBirth" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <h3>Contact Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea id="address" rows="3" required></textarea>
+                    </div>
+
+                    <!-- Employment Details -->
+                    <h3>Employment Details</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="department">Department</label>
+                            <select id="department" required>
+                                <option value="">Select Department</option>
+                                <option value="sales">Sales</option>
+                                <option value="inventory">Inventory</option>
+                                <option value="accounts">Accounts</option>
+                                <option value="hr">Human Resources</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="position">Position</label>
+                            <input type="text" id="position" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="joinDate">Join Date</label>
+                            <input type="date" id="joinDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employmentType">Employment Type</label>
+                            <select id="employmentType" required>
+                                <option value="">Select Type</option>
+                                <option value="full-time">Full Time</option>
+                                <option value="part-time">Part Time</option>
+                                <option value="contract">Contract</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Salary Information -->
+                    <h3>Salary Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="basicSalary">Basic Salary</label>
+                            <input type="number" id="basicSalary" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentInterval">Payment Interval</label>
+                            <select id="paymentInterval" required>
+                                <option value="monthly">Monthly</option>
+                                <option value="bi-weekly">Bi-weekly</option>
+                                <option value="weekly">Weekly</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAddEmployeeDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Employee</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Dialog -->
+    <div class="dialog-overlay" id="importDialog">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h2>Import Employees</h2>
+                <button class="close-btn" onclick="closeImportDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="importForm" onsubmit="handleImport(event)">
+                    <div class="form-group">
+                        <label for="importFile">Select File</label>
+                        <input type="file" id="importFile" accept=".csv,.xlsx" required>
+                        <small class="text-muted">Supported formats: CSV, Excel</small>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="updateExisting">
+                            Update existing records
+                        </label>
+                    </div>
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeImportDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const employeeDialog = document.getElementById('addEmployeeDialog');
+    const importDialog = document.getElementById('importDialog');
+    
+    window.openAddEmployeeDialog = function() {
+        employeeDialog.classList.add('active');
+    };
+
+    window.closeAddEmployeeDialog = function() {
+        employeeDialog.classList.remove('active');
+    };
+
+    window.openImportDialog = function() {
+        importDialog.classList.add('active');
+    };
+
+    window.closeImportDialog = function() {
+        importDialog.classList.remove('active');
+    };
+
+    window.handleAddEmployee = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to save the employee
+        closeAddEmployeeDialog();
+    };
+
+    window.handleImport = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to handle import
+        closeImportDialog();
+    };
+
+    window.viewEmployee = function(employeeId) {
+        // Add your logic to view employee details
+        console.log('Viewing employee:', employeeId);
+    };
+
+    window.editEmployee = function(employeeId) {
+        // Add your logic to edit employee
+        console.log('Editing employee:', employeeId);
+    };
+
+    window.toggleEmployeeStatus = function(employeeId) {
+        // Add your logic to toggle employee status
+        console.log('Toggling status for employee:', employeeId);
+    };
+
+    window.toggleActionMenu = function(button) {
+        // Close all other open menus
+        document.querySelectorAll('.action-menu.active').forEach(menu => {
+            if (menu !== button.nextElementSibling) {
+                menu.classList.remove('active');
+            }
+        });
+        
+        // Toggle this menu
+        const menu = button.nextElementSibling;
+        menu.classList.toggle('active');
+    };
+
+    // Close action menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.action-dropdown')) {
+            document.querySelectorAll('.action-menu.active').forEach(menu => {
+                menu.classList.remove('active');
+            });
+        }
+    });
+
+    // Close dialogs when clicking outside
+    [employeeDialog, importDialog].forEach(dialog => {
+        dialog.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+    });
+});
+</script>
+
+<style>
+.employee-container {
+    padding: 20px;
+}
+
+.employee-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dialog-lg {
+    max-width: 800px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+h3 {
+    margin: 20px 0 10px;
+    color: #374151;
+    font-size: 1.1em;
+}
+
+.action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    color: #6B7280;
+}
+
+.action-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.action-menu.active {
+    display: block;
+}
+
+.action-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #374151;
+    font-size: 0.9em;
+}
+
+.action-menu button:hover {
+    background: #F3F4F6;
+}
+
+.action-menu i {
+    width: 20px;
+    margin-right: 8px;
+}
+
+.text-muted {
+    color: #6B7280;
+    font-size: 0.875rem;
+}
+</style> 

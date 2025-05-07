@@ -1,0 +1,148 @@
+<div class="banking-container">
+    <div class="page-header">
+        <h1>Banking</h1>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('accounts')">
+                <i class="fas fa-university"></i> Bank Accounts
+            </button>
+            <button class="tab-btn" onclick="switchTab('deposits')">
+                <i class="fas fa-money-bill-wave"></i> Deposits
+            </button>
+            <button class="tab-btn" onclick="switchTab('transfers')">
+                <i class="fas fa-exchange-alt"></i> Transfers
+            </button>
+        </div>
+
+        <div class="tab-content">
+            <div id="accounts" class="tab-pane active">
+                <!-- Bank Accounts content will be loaded here -->
+            </div>
+            <div id="deposits" class="tab-pane">
+                <!-- Deposits content will be loaded here -->
+            </div>
+            <div id="transfers" class="tab-pane">
+                <!-- Transfers content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load initial content
+    loadTabContent('accounts');
+});
+
+function switchTab(tabId) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`.tab-btn[onclick*="${tabId}"]`).classList.add('active');
+
+    // Update tab panes
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('active');
+    });
+    document.getElementById(tabId).classList.add('active');
+
+    // Load content if not already loaded
+    loadTabContent(tabId);
+}
+
+function loadTabContent(tabId) {
+    const contentDiv = document.getElementById(tabId);
+    if (!contentDiv.hasChildNodes()) {
+        fetch(`bank-${tabId}.html`)
+            .then(response => response.text())
+            .then(html => {
+                contentDiv.innerHTML = html;
+                // Execute scripts in the loaded content
+                const scripts = contentDiv.getElementsByTagName('script');
+                for (let script of scripts) {
+                    eval(script.innerHTML);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading tab content:', error);
+                contentDiv.innerHTML = '<p class="error">Error loading content. Please try again.</p>';
+            });
+    }
+}
+</script>
+
+<style>
+.banking-container {
+    padding: 20px;
+}
+
+.tabs-container {
+    margin-top: 20px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid #E5E7EB;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    border: none;
+    background: none;
+    color: #6B7280;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.tab-btn i {
+    font-size: 18px;
+}
+
+.tab-btn:hover {
+    color: #374151;
+}
+
+.tab-btn.active {
+    color: #2563EB;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #2563EB;
+}
+
+.tab-content {
+    background: white;
+    border-radius: 8px;
+    min-height: 400px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.error {
+    color: #DC2626;
+    text-align: center;
+    padding: 20px;
+}
+</style> 

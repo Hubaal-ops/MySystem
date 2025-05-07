@@ -1,0 +1,237 @@
+<div class="bank-deposit-container">
+    <div class="page-header">
+        <h1>Bank Deposits</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddDepositDialog()">
+                <i class="fas fa-plus"></i> New Deposit
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Date</th>
+                    <th>Bank Account</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="depositTableBody">
+                <tr>
+                    <td>DEP-2024-001</td>
+                    <td>2024-02-25</td>
+                    <td>Main Operating Account</td>
+                    <td>$5,000.00</td>
+                    <td>Cash</td>
+                    <td><span class="badge badge-success">Completed</span></td>
+                    <td>
+                        <button class="btn-link" onclick="viewDepositDetails('1')">View</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add/Edit Deposit Dialog -->
+    <div class="dialog-overlay" id="depositDialog">
+        <div class="dialog dialog-lg">
+            <div class="dialog-header">
+                <h2 id="dialogTitle">New Deposit</h2>
+                <button class="close-btn" onclick="closeDepositDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="depositForm" onsubmit="handleDepositSubmit(event)">
+                    <input type="hidden" id="depositAction" value="add">
+                    
+                    <!-- Basic Information -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reference">Reference</label>
+                            <input type="text" id="reference" readonly>
+                            <small class="text-muted">Auto-generated</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="depositDate">Date</label>
+                            <input type="date" id="depositDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bankAccount">Bank Account</label>
+                            <select id="bankAccount" required>
+                                <option value="">Select Account</option>
+                                <option value="1">Main Operating Account</option>
+                                <option value="2">Savings Account</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <input type="number" id="amount" required step="0.01" min="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="paymentMethod">Payment Method</label>
+                            <select id="paymentMethod" required>
+                                <option value="">Select Method</option>
+                                <option value="cash">Cash</option>
+                                <option value="check">Check</option>
+                                <option value="transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="referenceNumber">Reference Number</label>
+                            <input type="text" id="referenceNumber" placeholder="Check/Transfer number">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="attachment">Attachment</label>
+                        <input type="file" id="attachment" accept=".pdf,.jpg,.jpeg,.png">
+                        <small class="text-muted">Upload receipt or supporting document (PDF, JPG, PNG)</small>
+                    </div>
+
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeDepositDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Deposit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dialog = document.getElementById('depositDialog');
+    
+    window.openAddDepositDialog = function() {
+        document.getElementById('dialogTitle').textContent = 'New Deposit';
+        document.getElementById('depositAction').value = 'add';
+        document.getElementById('reference').value = generateDepositReference();
+        document.getElementById('depositDate').valueAsDate = new Date();
+        document.getElementById('depositForm').reset();
+        dialog.classList.add('active');
+    };
+
+    window.closeDepositDialog = function() {
+        dialog.classList.remove('active');
+        document.getElementById('depositForm').reset();
+    };
+
+    window.handleDepositSubmit = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to save the deposit
+        closeDepositDialog();
+    };
+
+    window.generateDepositReference = function() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        return `DEP-${year}${month}-${random}`;
+    };
+
+    // Close dialog when clicking outside
+    dialog.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDepositDialog();
+        }
+    });
+});
+</script>
+
+<style>
+.bank-deposit-container {
+    padding: 20px;
+}
+
+.dialog-lg {
+    max-width: 800px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group input[type="file"] {
+    padding: 6px;
+}
+
+.text-muted {
+    color: #6B7280;
+    font-size: 0.875rem;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background: #6B7280;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #4B5563;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: #10B981;
+    color: white;
+}
+</style> 

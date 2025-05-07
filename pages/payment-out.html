@@ -1,0 +1,250 @@
+<div class="payment-out-container">
+    <div class="page-header">
+        <h1>Payment Out</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddPaymentDialog()">
+                <i class="fas fa-money-bill-wave"></i> New Payment
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Date</th>
+                    <th>Supplier</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="paymentTableBody">
+                <tr>
+                    <td>PAY-2024-001</td>
+                    <td>2024-02-25</td>
+                    <td>Tech Supplies Inc</td>
+                    <td>$12,500.00</td>
+                    <td>Bank Transfer</td>
+                    <td>TRF123456</td>
+                    <td><span class="badge badge-success">Completed</span></td>
+                    <td>
+                        <button class="btn-link" onclick="viewPaymentDetails('PAY-2024-001')">View</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Payment Dialog -->
+    <div class="dialog-overlay" id="addPaymentDialog">
+        <div class="dialog dialog-lg">
+            <div class="dialog-header">
+                <h2>New Payment</h2>
+                <button class="close-btn" onclick="closeAddPaymentDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="addPaymentForm" onsubmit="handleAddPayment(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="supplier">Supplier</label>
+                            <select id="supplier" required onchange="loadSupplierInvoices()">
+                                <option value="">Select Supplier</option>
+                                <option value="1">Tech Supplies Inc</option>
+                                <option value="2">Global Imports Ltd</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentDate">Payment Date</label>
+                            <input type="date" id="paymentDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Outstanding Invoices</label>
+                        <div class="invoice-list">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Invoice/PO</th>
+                                        <th>Date</th>
+                                        <th>Due Date</th>
+                                        <th>Total Amount</th>
+                                        <th>Outstanding</th>
+                                        <th>Pay Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoiceTableBody">
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" onchange="togglePaymentAmount(this)">
+                                        </td>
+                                        <td>PO-2024-001</td>
+                                        <td>2024-02-15</td>
+                                        <td>2024-03-15</td>
+                                        <td class="text-right">12,500.00</td>
+                                        <td class="text-right outstanding-amount">12,500.00</td>
+                                        <td>
+                                            <input type="number" class="payment-amount" disabled step="0.01" max="12500.00">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6" class="text-right"><strong>Total Payment Amount:</strong></td>
+                                        <td id="totalPayment" class="text-right">0.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="paymentMethod">Payment Method</label>
+                            <select id="paymentMethod" required>
+                                <option value="">Select Method</option>
+                                <option value="cash">Cash</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="check">Check</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reference">Reference Number</label>
+                            <input type="text" id="reference" placeholder="Check/Transaction number">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="account">Payment Account</label>
+                            <select id="account" required>
+                                <option value="">Select Account</option>
+                                <option value="main">Main Account</option>
+                                <option value="petty">Petty Cash</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAddPaymentDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Process Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dialog = document.getElementById('addPaymentDialog');
+    
+    window.openAddPaymentDialog = function() {
+        dialog.classList.add('active');
+    };
+
+    window.closeAddPaymentDialog = function() {
+        dialog.classList.remove('active');
+    };
+
+    window.handleAddPayment = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to save the payment
+        closeAddPaymentDialog();
+    };
+
+    window.loadSupplierInvoices = function() {
+        const supplier = document.getElementById('supplier').value;
+        // In a real application, you would fetch the supplier's outstanding invoices
+        // and populate the invoice table
+    };
+
+    window.togglePaymentAmount = function(checkbox) {
+        const row = checkbox.closest('tr');
+        const paymentInput = row.querySelector('.payment-amount');
+        const outstandingAmount = parseFloat(row.querySelector('.outstanding-amount').textContent.replace(',', ''));
+        
+        if (checkbox.checked) {
+            paymentInput.disabled = false;
+            paymentInput.value = outstandingAmount.toFixed(2);
+        } else {
+            paymentInput.disabled = true;
+            paymentInput.value = '';
+        }
+        
+        calculateTotalPayment();
+    };
+
+    window.calculateTotalPayment = function() {
+        const paymentAmounts = Array.from(document.querySelectorAll('.payment-amount'))
+            .map(input => parseFloat(input.value) || 0);
+        
+        const total = paymentAmounts.reduce((sum, amount) => sum + amount, 0);
+        document.getElementById('totalPayment').textContent = total.toFixed(2);
+    };
+
+    window.viewPaymentDetails = function(paymentId) {
+        // Add your logic to view payment details
+        console.log('Viewing payment:', paymentId);
+    };
+
+    // Add event listeners for payment amount changes
+    document.querySelectorAll('.payment-amount').forEach(input => {
+        input.addEventListener('change', calculateTotalPayment);
+    });
+
+    // Close dialog when clicking outside
+    dialog.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAddPaymentDialog();
+        }
+    });
+});
+</script>
+
+<style>
+.payment-out-container {
+    padding: 20px;
+}
+
+.dialog-lg {
+    max-width: 1000px;
+}
+
+.invoice-list {
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.payment-amount {
+    width: 120px;
+    text-align: right;
+}
+
+.text-right {
+    text-align: right;
+}
+
+tfoot tr td {
+    font-weight: bold;
+}
+
+#totalPayment {
+    font-size: 1.1em;
+    color: #2563eb;
+}
+</style> 

@@ -1,0 +1,379 @@
+<div class="expense-category-container">
+    <div class="page-header">
+        <h1>Expense Categories</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddCategoryDialog()">
+                <i class="fas fa-folder-plus"></i> New Category
+            </button>
+        </div>
+    </div>
+
+    <div class="expense-category-content">
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Category Name</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryTableBody">
+                    <tr>
+                        <td>CAT001</td>
+                        <td>Office Supplies</td>
+                        <td>General office supplies and stationery</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                        <td>
+                            <div class="action-dropdown">
+                                <button class="btn-icon" onclick="toggleActionMenu(this)">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="action-menu">
+                                    <button onclick="editCategory('CAT001')">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button onclick="toggleCategoryStatus('CAT001')">
+                                        <i class="fas fa-ban"></i> Deactivate
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>CAT002</td>
+                        <td>Utilities</td>
+                        <td>Electricity, water, internet bills</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                        <td>
+                            <div class="action-dropdown">
+                                <button class="btn-icon" onclick="toggleActionMenu(this)">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="action-menu">
+                                    <button onclick="editCategory('CAT002')">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button onclick="toggleCategoryStatus('CAT002')">
+                                        <i class="fas fa-ban"></i> Deactivate
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Category Dialog -->
+    <div class="dialog-overlay" id="categoryDialog">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h2 id="dialogTitle">New Expense Category</h2>
+                <button class="close-btn" onclick="closeCategoryDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="categoryForm" onsubmit="handleCategorySubmit(event)">
+                    <input type="hidden" id="categoryAction" value="add">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoryId">Category ID</label>
+                            <input type="text" id="categoryId" readonly>
+                            <small class="text-muted">Auto-generated</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryName">Category Name</label>
+                            <input type="text" id="categoryName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoryDescription">Description</label>
+                        <textarea id="categoryDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoryStatus">Status</label>
+                            <select id="categoryStatus" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeCategoryDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="submitButton">Save Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryDialog = document.getElementById('categoryDialog');
+    
+    window.openAddCategoryDialog = function() {
+        document.getElementById('dialogTitle').textContent = 'New Expense Category';
+        document.getElementById('categoryAction').value = 'add';
+        document.getElementById('categoryId').value = generateCategoryId();
+        document.getElementById('submitButton').textContent = 'Save Category';
+        document.getElementById('categoryForm').reset();
+        categoryDialog.classList.add('active');
+    };
+
+    window.editCategory = function(categoryId) {
+        document.getElementById('dialogTitle').textContent = 'Edit Expense Category';
+        document.getElementById('categoryAction').value = 'edit';
+        document.getElementById('submitButton').textContent = 'Update Category';
+
+        const row = document.querySelector(`tr[data-category-id="${categoryId}"]`);
+        if (row) {
+            document.getElementById('categoryId').value = categoryId;
+            document.getElementById('categoryName').value = row.cells[1].textContent;
+            document.getElementById('categoryDescription').value = row.cells[2].textContent;
+            document.getElementById('categoryStatus').value = 
+                row.querySelector('.badge').classList.contains('badge-success') ? 'active' : 'inactive';
+        }
+        categoryDialog.classList.add('active');
+    };
+
+    window.closeCategoryDialog = function() {
+        categoryDialog.classList.remove('active');
+        document.getElementById('categoryForm').reset();
+    };
+
+    window.handleCategorySubmit = function(event) {
+        event.preventDefault();
+        const action = document.getElementById('categoryAction').value;
+        const formData = {
+            id: document.getElementById('categoryId').value,
+            name: document.getElementById('categoryName').value,
+            description: document.getElementById('categoryDescription').value,
+            status: document.getElementById('categoryStatus').value
+        };
+
+        if (action === 'add') {
+            addCategoryToTable(formData);
+        } else {
+            updateCategoryInTable(formData);
+        }
+        closeCategoryDialog();
+    };
+
+    window.toggleCategoryStatus = function(categoryId) {
+        const row = document.querySelector(`tr[data-category-id="${categoryId}"]`);
+        if (row) {
+            const statusCell = row.cells[3];
+            const badge = statusCell.querySelector('.badge');
+            const isActive = badge.classList.contains('badge-success');
+            
+            badge.classList.remove(isActive ? 'badge-success' : 'badge-danger');
+            badge.classList.add(isActive ? 'badge-danger' : 'badge-success');
+            badge.textContent = isActive ? 'Inactive' : 'Active';
+            
+            const actionButton = row.querySelector('.action-menu button:last-child');
+            actionButton.innerHTML = `<i class="fas fa-${isActive ? 'check' : 'ban'}"></i> ${isActive ? 'Activate' : 'Deactivate'}`;
+        }
+    };
+
+    function addCategoryToTable(formData) {
+        const tbody = document.getElementById('categoryTableBody');
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-category-id', formData.id);
+        tr.innerHTML = `
+            <td>${formData.id}</td>
+            <td>${formData.name}</td>
+            <td>${formData.description}</td>
+            <td><span class="badge badge-${formData.status === 'active' ? 'success' : 'danger'}">${formData.status === 'active' ? 'Active' : 'Inactive'}</span></td>
+            <td>
+                <div class="action-dropdown">
+                    <button class="btn-icon" onclick="toggleActionMenu(this)">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="action-menu">
+                        <button onclick="editCategory('${formData.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button onclick="toggleCategoryStatus('${formData.id}')">
+                            <i class="fas fa-${formData.status === 'active' ? 'ban' : 'check'}"></i> ${formData.status === 'active' ? 'Deactivate' : 'Activate'}
+                        </button>
+                    </div>
+                </div>
+            </td>
+        `;
+        tbody.insertBefore(tr, tbody.firstChild);
+    }
+
+    function updateCategoryInTable(formData) {
+        const row = document.querySelector(`tr[data-category-id="${formData.id}"]`);
+        if (row) {
+            row.cells[1].textContent = formData.name;
+            row.cells[2].textContent = formData.description;
+            const statusCell = row.cells[3];
+            statusCell.innerHTML = `<span class="badge badge-${formData.status === 'active' ? 'success' : 'danger'}">${formData.status === 'active' ? 'Active' : 'Inactive'}</span>`;
+            
+            const actionButton = row.querySelector('.action-menu button:last-child');
+            actionButton.innerHTML = `<i class="fas fa-${formData.status === 'active' ? 'ban' : 'check'}"></i> ${formData.status === 'active' ? 'Deactivate' : 'Activate'}`;
+        }
+    }
+
+    window.toggleActionMenu = function(button) {
+        document.querySelectorAll('.action-menu.active').forEach(menu => {
+            if (menu !== button.nextElementSibling) {
+                menu.classList.remove('active');
+            }
+        });
+        const menu = button.nextElementSibling;
+        menu.classList.toggle('active');
+    };
+
+    window.generateCategoryId = function() {
+        const date = new Date();
+        const year = date.getFullYear().toString().substr(-2);
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        return `CAT${year}${month}${random}`;
+    };
+
+    // Close dialog when clicking outside
+    categoryDialog.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeCategoryDialog();
+        }
+    });
+
+    // Close action menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.action-dropdown')) {
+            document.querySelectorAll('.action-menu.active').forEach(menu => {
+                menu.classList.remove('active');
+            });
+        }
+    });
+});
+</script>
+
+<style>
+.expense-category-container {
+    padding: 20px;
+}
+
+.expense-category-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.text-muted {
+    color: #6B7280;
+    font-size: 0.875rem;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.badge-success {
+    background-color: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-danger {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}
+
+.action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    color: #6B7280;
+}
+
+.action-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.action-menu.active {
+    display: block;
+}
+
+.action-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #374151;
+    font-size: 0.9em;
+}
+
+.action-menu button:hover {
+    background: #F3F4F6;
+}
+
+.action-menu i {
+    width: 20px;
+    margin-right: 8px;
+}
+
+.dialog {
+    max-width: 600px;
+}
+</style> 

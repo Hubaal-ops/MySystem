@@ -70,61 +70,334 @@
 
     <!-- Add Return Dialog -->
     <div class="dialog-overlay" id="addReturnDialog">
-        <div class="dialog">
+        <div class="dialog dialog-lg">
             <div class="dialog-header">
-                <h2>New Return</h2>
+                <h2>New Sales Return</h2>
                 <button class="close-btn" onclick="closeAddReturnDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
                 <form id="addReturnForm" onsubmit="handleAddReturn(event)">
-                    <div class="form-group">
-                        <label for="invoice">Select Invoice</label>
-                        <select id="invoice" required>
-                            <option value="">Select Invoice</option>
-                            <option value="1">INV-001 (John Doe)</option>
-                            <option value="2">INV-002 (Jane Smith)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="returnDate">Return Date</label>
-                        <input type="date" id="returnDate" required>
-                    </div>
-                    <div class="products-section">
-                        <h3>Return Products</h3>
-                        <div class="product-rows">
-                            <div class="product-row">
-                                <select class="product-select" disabled>
-                                    <option>Product 1</option>
-                                </select>
-                                <input type="number" placeholder="Qty Sold" value="5" readonly>
-                                <input type="number" placeholder="Return Qty" min="1" max="5">
-                                <input type="number" placeholder="Price" value="100" readonly>
-                                <button type="button" class="remove-row"><i class="fas fa-times"></i></button>
-                            </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="invoice">Select Invoice</label>
+                            <select id="invoice" required onchange="loadInvoiceDetails(this.value)">
+                                <option value="">Select Invoice</option>
+                                <option value="1">INV-001 (John Doe)</option>
+                                <option value="2">INV-002 (Jane Smith)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="returnDate">Return Date</label>
+                            <input type="date" id="returnDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="returnNo">Return No</label>
+                            <input type="text" id="returnNo" readonly>
                         </div>
                     </div>
+
                     <div class="form-group">
-                        <label for="reason">Return Reason</label>
-                        <select id="reason" required>
-                            <option value="">Select Reason</option>
-                            <option value="damaged">Damaged Product</option>
-                            <option value="wrong">Wrong Product</option>
-                            <option value="not_satisfied">Customer Not Satisfied</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <label>Return Items</label>
+                        <div class="return-items">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Description</th>
+                                        <th>Sold Qty</th>
+                                        <th>Return Qty</th>
+                                        <th>Unit Price</th>
+                                        <th>Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="returnItemsBody">
+                                    <tr>
+                                        <td>
+                                            <select class="product-select" disabled>
+                                                <option value="">Select Product</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="item-description" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="sold-qty" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="return-qty" min="1" onchange="calculateItemTotal(this.closest('tr'))">
+                                        </td>
+                                        <td>
+                                            <input type="number" class="unit-price" step="0.01" readonly>
+                                        </td>
+                                        <td class="item-total">0.00</td>
+                                        <td>
+                                            <button type="button" class="btn-danger" onclick="removeReturnItem(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="5" class="text-right"><strong>Total Return Amount:</strong></td>
+                                        <td id="total">0.00</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reason">Return Reason</label>
+                            <select id="reason" required>
+                                <option value="">Select Reason</option>
+                                <option value="damaged">Damaged Product</option>
+                                <option value="wrong">Wrong Product</option>
+                                <option value="not_satisfied">Customer Not Satisfied</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="refundMethod">Refund Method</label>
+                            <select id="refundMethod" required>
+                                <option value="">Select Refund Method</option>
+                                <option value="cash">Cash</option>
+                                <option value="card">Card</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="store_credit">Store Credit</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="notes">Notes</label>
                         <textarea id="notes" rows="3"></textarea>
                     </div>
+
                     <div class="dialog-actions">
                         <button type="button" class="btn-secondary" onclick="closeAddReturnDialog()">Cancel</button>
-                        <button type="submit" class="btn-primary">Save Return</button>
+                        <button type="submit" class="btn-primary">Create Return</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dialog = document.getElementById('addReturnDialog');
+    
+    window.openAddReturnDialog = function() {
+        dialog.classList.add('active');
+        document.getElementById('returnDate').valueAsDate = new Date();
+        generateReturnNo();
+    };
+
+    window.closeAddReturnDialog = function() {
+        dialog.classList.remove('active');
+        document.getElementById('addReturnForm').reset();
+        document.getElementById('returnItemsBody').innerHTML = '';
+        addEmptyReturnRow();
+    };
+
+    window.generateReturnNo = function() {
+        const date = new Date();
+        const year = date.getFullYear().toString().substr(-2);
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        document.getElementById('returnNo').value = `RET${year}${month}${random}`;
+    };
+
+    window.loadInvoiceDetails = function(invoiceId) {
+        // In a real application, you would fetch invoice details from the server
+        const tbody = document.getElementById('returnItemsBody');
+        tbody.innerHTML = '';
+
+        if (invoiceId === '1') {
+            addReturnItem({
+                product: 'Product 1',
+                description: 'Product 1 Description',
+                soldQty: 5,
+                unitPrice: 100.00
+            });
+            addReturnItem({
+                product: 'Product 2',
+                description: 'Product 2 Description',
+                soldQty: 3,
+                unitPrice: 200.00
+            });
+        } else if (invoiceId === '2') {
+            addReturnItem({
+                product: 'Product 3',
+                description: 'Product 3 Description',
+                soldQty: 2,
+                unitPrice: 150.00
+            });
+        }
+    };
+
+    window.addReturnItem = function(item) {
+        const tbody = document.getElementById('returnItemsBody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <select class="product-select" disabled>
+                    <option value="">${item.product}</option>
+                </select>
+            </td>
+            <td>
+                <input type="text" class="item-description" value="${item.description}" readonly>
+            </td>
+            <td>
+                <input type="number" class="sold-qty" value="${item.soldQty}" readonly>
+            </td>
+            <td>
+                <input type="number" class="return-qty" min="1" max="${item.soldQty}" onchange="calculateItemTotal(this.closest('tr'))">
+            </td>
+            <td>
+                <input type="number" class="unit-price" value="${item.unitPrice.toFixed(2)}" step="0.01" readonly>
+            </td>
+            <td class="item-total">0.00</td>
+            <td>
+                <button type="button" class="btn-danger" onclick="removeReturnItem(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    };
+
+    window.addEmptyReturnRow = function() {
+        const tbody = document.getElementById('returnItemsBody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <select class="product-select" disabled>
+                    <option value="">Select Product</option>
+                </select>
+            </td>
+            <td>
+                <input type="text" class="item-description" readonly>
+            </td>
+            <td>
+                <input type="number" class="sold-qty" readonly>
+            </td>
+            <td>
+                <input type="number" class="return-qty" min="1" onchange="calculateItemTotal(this.closest('tr'))">
+            </td>
+            <td>
+                <input type="number" class="unit-price" step="0.01" readonly>
+            </td>
+            <td class="item-total">0.00</td>
+            <td>
+                <button type="button" class="btn-danger" onclick="removeReturnItem(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    };
+
+    window.removeReturnItem = function(button) {
+        const tbody = document.getElementById('returnItemsBody');
+        if (tbody.children.length > 1) {
+            button.closest('tr').remove();
+        }
+        calculateTotals();
+    };
+
+    window.calculateItemTotal = function(row) {
+        const returnQty = parseInt(row.querySelector('.return-qty').value) || 0;
+        const soldQty = parseInt(row.querySelector('.sold-qty').value) || 0;
+        const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
+        
+        // Ensure return quantity doesn't exceed sold quantity
+        if (returnQty > soldQty) {
+            row.querySelector('.return-qty').value = soldQty;
+            return calculateItemTotal(row);
+        }
+        
+        const total = returnQty * unitPrice;
+        row.querySelector('.item-total').textContent = total.toFixed(2);
+        
+        calculateTotals();
+    };
+
+    window.calculateTotals = function() {
+        const itemTotals = Array.from(document.querySelectorAll('.item-total'))
+            .map(td => parseFloat(td.textContent) || 0);
+        
+        const total = itemTotals.reduce((sum, total) => sum + total, 0);
+        document.getElementById('total').textContent = total.toFixed(2);
+    };
+
+    window.handleAddReturn = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to save the return
+        closeAddReturnDialog();
+    };
+
+    // Close dialog when clicking outside
+    dialog.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAddReturnDialog();
+        }
+    });
+
+    // Initialize with one empty row
+    addEmptyReturnRow();
+});
+</script>
+
+<style>
+.return-items {
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.dialog-lg {
+    max-width: 1000px;
+}
+
+.product-select {
+    width: 200px;
+}
+
+.item-description {
+    width: 200px;
+}
+
+.sold-qty,
+.return-qty,
+.unit-price {
+    width: 100px;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.item-total {
+    text-align: right;
+}
+
+.btn-danger {
+    color: #dc2626;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    color: #991b1b;
+}
+</style> 

@@ -1,0 +1,342 @@
+<div class="stock-adjustment-container">
+    <div class="page-header">
+        <h1>Stock Adjustment</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddAdjustmentDialog()">
+                <i class="fas fa-balance-scale"></i> New Adjustment
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Adjustment ID</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Items</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="adjustmentTableBody">
+                <tr>
+                    <td>ADJ-2024-001</td>
+                    <td>2024-02-25</td>
+                    <td>Main Warehouse</td>
+                    <td><span class="badge badge-warning">Decrease</span></td>
+                    <td>3 items</td>
+                    <td>Damaged Goods</td>
+                    <td><span class="badge badge-success">Approved</span></td>
+                    <td>
+                        <button class="btn-link" onclick="viewAdjustmentDetails('ADJ-2024-001')">View</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add/Edit Stock Adjustment Dialog -->
+    <div class="dialog-overlay" id="adjustmentDialog">
+        <div class="dialog dialog-lg">
+            <div class="dialog-header">
+                <h2 id="dialogTitle">New Stock Adjustment</h2>
+                <button class="close-btn" onclick="closeAdjustmentDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="adjustmentForm" onsubmit="handleAdjustmentSubmit(event)">
+                    <input type="hidden" id="adjustmentAction" value="add">
+                    
+                    <!-- Basic Information -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adjustmentId">Adjustment ID</label>
+                            <input type="text" id="adjustmentId" readonly>
+                            <small class="text-muted">Auto-generated</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="adjustmentDate">Date</label>
+                            <input type="date" id="adjustmentDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <select id="location" required>
+                                <option value="">Select Location</option>
+                                <option value="main">Main Warehouse</option>
+                                <option value="store1">Store 1</option>
+                                <option value="store2">Store 2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="adjustmentType">Adjustment Type</label>
+                            <select id="adjustmentType" required>
+                                <option value="">Select Type</option>
+                                <option value="increase">Increase</option>
+                                <option value="decrease">Decrease</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Items Table -->
+                    <h3>Items</h3>
+                    <div class="table-container mb-3">
+                        <table class="data-table" id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Current Stock</th>
+                                    <th>Adjustment Quantity</th>
+                                    <th>New Stock</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsTableBody">
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn-secondary mt-2" onclick="addItemRow()">
+                            <i class="fas fa-plus"></i> Add Item
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reason">Reason</label>
+                            <select id="reason" required>
+                                <option value="">Select Reason</option>
+                                <option value="damaged">Damaged Goods</option>
+                                <option value="expired">Expired</option>
+                                <option value="lost">Lost/Missing</option>
+                                <option value="found">Found</option>
+                                <option value="correction">Stock Correction</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" required>
+                                <option value="draft">Draft</option>
+                                <option value="pending">Pending Approval</option>
+                                <option value="approved">Approved</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" rows="3"></textarea>
+                    </div>
+
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAdjustmentDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Adjustment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dialog = document.getElementById('adjustmentDialog');
+    
+    window.openAddAdjustmentDialog = function() {
+        document.getElementById('dialogTitle').textContent = 'New Stock Adjustment';
+        document.getElementById('adjustmentAction').value = 'add';
+        document.getElementById('adjustmentId').value = generateAdjustmentId();
+        document.getElementById('adjustmentDate').valueAsDate = new Date();
+        document.getElementById('adjustmentForm').reset();
+        clearItemsTable();
+        dialog.classList.add('active');
+    };
+
+    window.closeAdjustmentDialog = function() {
+        dialog.classList.remove('active');
+        document.getElementById('adjustmentForm').reset();
+        clearItemsTable();
+    };
+
+    window.handleAdjustmentSubmit = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to save the adjustment
+        closeAdjustmentDialog();
+    };
+
+    window.addItemRow = function() {
+        const tbody = document.getElementById('itemsTableBody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <select class="form-control" required onchange="updateCurrentStock(this)">
+                    <option value="">Select Product</option>
+                    <option value="1">Product 1</option>
+                    <option value="2">Product 2</option>
+                </select>
+            </td>
+            <td class="current-stock">0</td>
+            <td>
+                <input type="number" class="form-control" required min="1" onchange="updateNewStock(this)">
+            </td>
+            <td class="new-stock">0</td>
+            <td>
+                <button type="button" class="btn-icon" onclick="removeItemRow(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    };
+
+    window.removeItemRow = function(button) {
+        button.closest('tr').remove();
+    };
+
+    window.updateCurrentStock = function(select) {
+        // This would typically fetch the current stock from your database
+        const row = select.closest('tr');
+        const currentStock = Math.floor(Math.random() * 1000); // Dummy value
+        row.querySelector('.current-stock').textContent = currentStock;
+        updateNewStock(row.querySelector('input[type="number"]'));
+    };
+
+    window.updateNewStock = function(input) {
+        const row = input.closest('tr');
+        const currentStock = parseInt(row.querySelector('.current-stock').textContent);
+        const adjustmentType = document.getElementById('adjustmentType').value;
+        const adjustmentQty = parseInt(input.value) || 0;
+        
+        const newStock = adjustmentType === 'increase' 
+            ? currentStock + adjustmentQty 
+            : currentStock - adjustmentQty;
+            
+        row.querySelector('.new-stock').textContent = newStock;
+    };
+
+    window.generateAdjustmentId = function() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        return `ADJ-${year}${month}-${random}`;
+    };
+
+    function clearItemsTable() {
+        document.getElementById('itemsTableBody').innerHTML = '';
+    }
+
+    // Close dialog when clicking outside
+    dialog.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAdjustmentDialog();
+        }
+    });
+});
+</script>
+
+<style>
+.stock-adjustment-container {
+    padding: 20px;
+}
+
+.dialog-lg {
+    max-width: 1000px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+h3 {
+    margin: 20px 0 10px;
+    color: #374151;
+    font-size: 1.1em;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.text-muted {
+    color: #6B7280;
+    font-size: 0.875rem;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    color: #6B7280;
+}
+
+.btn-icon:hover {
+    color: #EF4444;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background: #6B7280;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+    background: #4B5563;
+}
+</style> 

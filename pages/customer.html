@@ -1,0 +1,286 @@
+<div class="customer-container">
+    <div class="page-header">
+        <h1>Customers</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddCustomerDialog()">
+                <i class="fas fa-plus"></i> Add Customer
+            </button>
+            <button class="btn-success">
+                <i class="fas fa-file-import"></i> Import Customers
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Total Purchases</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="customerTableBody">
+                <!-- Customer rows will be loaded dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Customer Dialog -->
+    <div class="dialog-overlay" id="addCustomerDialog">
+        <div class="dialog dialog-lg">
+            <div class="dialog-header">
+                <h2>New Customer</h2>
+                <button class="close-btn" onclick="closeAddCustomerDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="addCustomerForm" onsubmit="handleAddCustomer(event)">
+                    <h3>Personal Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                    </div>
+
+                    <h3>Address</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="address">Street Address</label>
+                            <input type="text" id="address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="state">State/Province</label>
+                            <input type="text" id="state">
+                        </div>
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code</label>
+                            <input type="text" id="postalCode">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select id="country" required>
+                                <option value="">Select Country</option>
+                                <option value="US">United States</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="CA">Canada</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerType">Customer Type</label>
+                            <select id="customerType" required>
+                                <option value="retail">Retail</option>
+                                <option value="wholesale">Wholesale</option>
+                                <option value="distributor">Distributor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3>Additional Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taxId">Tax ID</label>
+                            <input type="text" id="taxId">
+                        </div>
+                        <div class="form-group">
+                            <label for="creditLimit">Credit Limit</label>
+                            <input type="number" id="creditLimit" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="paymentTerms">Payment Terms (Days)</label>
+                            <input type="number" id="paymentTerms" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" rows="3"></textarea>
+                    </div>
+
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAddCustomerDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Customer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dialog = document.getElementById('addCustomerDialog');
+    
+    window.openAddCustomerDialog = function() {
+        dialog.classList.add('active');
+    };
+
+    window.closeAddCustomerDialog = function() {
+        dialog.classList.remove('active');
+        document.getElementById('addCustomerForm').reset();
+    };
+
+    window.handleAddCustomer = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to save the customer
+        closeAddCustomerDialog();
+    };
+
+    window.viewCustomerDetails = function(customerId) {
+        // Load customer details page with the specific customer ID
+        window.parent.loadContent('customer-detail', customerId);
+    };
+
+    // Load sample customer data
+    const sampleCustomers = [
+        {
+            id: 1,
+            name: 'John Doe',
+            phone: '+1234567890',
+            email: 'john@example.com',
+            address: '123 Main St',
+            totalPurchases: '$1,500',
+            balance: '$200',
+            status: 'Active'
+        },
+        // Add more sample customers as needed
+    ];
+
+    // Populate table with sample data
+    const tbody = document.getElementById('customerTableBody');
+    sampleCustomers.forEach(customer => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${customer.name}</td>
+            <td>${customer.phone}</td>
+            <td>${customer.email}</td>
+            <td>${customer.address}</td>
+            <td>${customer.totalPurchases}</td>
+            <td>${customer.balance}</td>
+            <td><span class="badge badge-active">${customer.status}</span></td>
+            <td>
+                <button class="btn-action" onclick="viewCustomerDetails(${customer.id})">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    // Close dialog when clicking outside
+    dialog.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAddCustomerDialog();
+        }
+    });
+});
+</script>
+
+<style>
+.customer-container {
+    padding: 20px;
+}
+
+.dialog-lg {
+    max-width: 1000px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+h3 {
+    margin: 20px 0 10px;
+    color: #374151;
+    font-size: 1.1em;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background: #6B7280;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #4B5563;
+}
+</style> 

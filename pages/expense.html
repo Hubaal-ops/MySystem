@@ -1,0 +1,337 @@
+<div class="expense-container">
+    <div class="page-header">
+        <h1>Expenses</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddExpenseDialog()">
+                <i class="fas fa-plus"></i> New Expense
+            </button>
+        </div>
+    </div>
+
+    <div class="expense-content">
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Reference</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="expenseTableBody">
+                    <tr>
+                        <td>2024-02-25</td>
+                        <td>EXP-2024-001</td>
+                        <td>Office Supplies</td>
+                        <td>Monthly office supplies</td>
+                        <td class="text-right">$450.00</td>
+                        <td>Cash</td>
+                        <td><span class="badge badge-success">Paid</span></td>
+                        <td>
+                            <div class="action-dropdown">
+                                <button class="btn-icon" onclick="toggleActionMenu(this)">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="action-menu">
+                                    <button onclick="viewExpenseDetails('EXP-2024-001')">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    <button onclick="editExpense('EXP-2024-001')">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button onclick="deleteExpense('EXP-2024-001')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Expense Dialog -->
+    <div class="dialog-overlay" id="expenseDialog">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h2 id="dialogTitle">New Expense</h2>
+                <button class="close-btn" onclick="closeExpenseDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="expenseForm" onsubmit="handleExpenseSubmit(event)">
+                    <input type="hidden" id="expenseAction" value="add">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expenseDate">Date</label>
+                            <input type="date" id="expenseDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseReference">Reference</label>
+                            <input type="text" id="expenseReference" readonly>
+                            <small class="text-muted">Auto-generated</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expenseCategory">Category</label>
+                            <select id="expenseCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="office">Office Supplies</option>
+                                <option value="utilities">Utilities</option>
+                                <option value="rent">Rent</option>
+                                <option value="salary">Salary</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseAmount">Amount</label>
+                            <input type="number" id="expenseAmount" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="paymentMethod">Payment Method</label>
+                            <select id="paymentMethod" required>
+                                <option value="">Select Method</option>
+                                <option value="cash">Cash</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="card">Credit Card</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentAccount">Payment Account</label>
+                            <select id="paymentAccount" required>
+                                <option value="">Select Account</option>
+                                <option value="cash">Cash Account</option>
+                                <option value="bank1">Bank Account 1</option>
+                                <option value="bank2">Bank Account 2</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDescription">Description</label>
+                        <textarea id="expenseDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseAttachment">Attachment</label>
+                        <input type="file" id="expenseAttachment">
+                        <small class="text-muted">Upload receipt or invoice (optional)</small>
+                    </div>
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeExpenseDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="submitButton">Save Expense</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const expenseDialog = document.getElementById('expenseDialog');
+    
+    window.openAddExpenseDialog = function() {
+        document.getElementById('dialogTitle').textContent = 'New Expense';
+        document.getElementById('expenseAction').value = 'add';
+        document.getElementById('expenseReference').value = generateExpenseReference();
+        document.getElementById('expenseDate').valueAsDate = new Date();
+        document.getElementById('submitButton').textContent = 'Save Expense';
+        document.getElementById('expenseForm').reset();
+        expenseDialog.classList.add('active');
+    };
+
+    window.editExpense = function(expenseId) {
+        document.getElementById('dialogTitle').textContent = 'Edit Expense';
+        document.getElementById('expenseAction').value = 'edit';
+        document.getElementById('submitButton').textContent = 'Update Expense';
+
+        const row = document.querySelector(`tr[data-expense-id="${expenseId}"]`);
+        if (row) {
+            document.getElementById('expenseReference').value = expenseId;
+            document.getElementById('expenseDate').value = row.cells[0].textContent;
+            document.getElementById('expenseCategory').value = row.cells[2].textContent.toLowerCase();
+            document.getElementById('expenseDescription').value = row.cells[3].textContent;
+            document.getElementById('expenseAmount').value = row.cells[4].textContent.replace('$', '');
+            document.getElementById('paymentMethod').value = row.cells[5].textContent.toLowerCase();
+        }
+        expenseDialog.classList.add('active');
+    };
+
+    window.closeExpenseDialog = function() {
+        expenseDialog.classList.remove('active');
+        document.getElementById('expenseForm').reset();
+    };
+
+    window.handleExpenseSubmit = function(event) {
+        event.preventDefault();
+        const action = document.getElementById('expenseAction').value;
+        const formData = {
+            date: document.getElementById('expenseDate').value,
+            reference: document.getElementById('expenseReference').value,
+            category: document.getElementById('expenseCategory').value,
+            description: document.getElementById('expenseDescription').value,
+            amount: document.getElementById('expenseAmount').value,
+            paymentMethod: document.getElementById('paymentMethod').value,
+            paymentAccount: document.getElementById('paymentAccount').value
+        };
+
+        if (action === 'add') {
+            addExpenseToTable(formData);
+        } else {
+            updateExpenseInTable(formData);
+        }
+        closeExpenseDialog();
+    };
+
+    window.generateExpenseReference = function() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        return `EXP-${year}-${month}${random}`;
+    };
+
+    function addExpenseToTable(formData) {
+        const tbody = document.getElementById('expenseTableBody');
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-expense-id', formData.reference);
+        tr.innerHTML = `
+            <td>${formData.date}</td>
+            <td>${formData.reference}</td>
+            <td>${formData.category}</td>
+            <td>${formData.description}</td>
+            <td class="text-right">$${parseFloat(formData.amount).toFixed(2)}</td>
+            <td>${formData.paymentMethod}</td>
+            <td><span class="badge badge-success">Paid</span></td>
+            <td>
+                <div class="action-dropdown">
+                    <button class="btn-icon" onclick="toggleActionMenu(this)">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="action-menu">
+                        <button onclick="viewExpenseDetails('${formData.reference}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button onclick="editExpense('${formData.reference}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button onclick="deleteExpense('${formData.reference}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </td>
+        `;
+        tbody.insertBefore(tr, tbody.firstChild);
+    }
+
+    function updateExpenseInTable(formData) {
+        const row = document.querySelector(`tr[data-expense-id="${formData.reference}"]`);
+        if (row) {
+            row.cells[0].textContent = formData.date;
+            row.cells[2].textContent = formData.category;
+            row.cells[3].textContent = formData.description;
+            row.cells[4].textContent = `$${parseFloat(formData.amount).toFixed(2)}`;
+            row.cells[5].textContent = formData.paymentMethod;
+        }
+    }
+
+    // Close dialog when clicking outside
+    expenseDialog.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeExpenseDialog();
+        }
+    });
+
+    // Close action menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.action-dropdown')) {
+            document.querySelectorAll('.action-menu.active').forEach(menu => {
+                menu.classList.remove('active');
+            });
+        }
+    });
+});
+</script>
+
+<style>
+.expense-container {
+    padding: 20px;
+}
+
+.expense-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.text-muted {
+    color: #6B7280;
+    font-size: 0.875rem;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.badge-success {
+    background-color: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-danger {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}
+
+.dialog {
+    max-width: 600px;
+}
+</style> 

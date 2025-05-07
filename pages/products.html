@@ -46,55 +46,93 @@
 
     <!-- Add Product Dialog -->
     <div class="dialog-overlay" id="addProductDialog">
-        <div class="dialog">
+        <div class="dialog dialog-lg">
             <div class="dialog-header">
-                <h2>Add New Product</h2>
+                <h2>New Product</h2>
                 <button class="close-btn" onclick="closeAddProductDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
                 <form id="addProductForm" onsubmit="handleAddProduct(event)">
-                    <div class="form-group">
-                        <label for="productName">Product Name</label>
-                        <input type="text" id="productName" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productName">Product Name</label>
+                            <input type="text" id="productName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productType">Product Type</label>
+                            <select id="productType" required>
+                                <option value="">Select Type</option>
+                                <option value="physical">Physical</option>
+                                <option value="digital">Digital</option>
+                                <option value="service">Service</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="productType">Product Type</label>
-                        <select id="productType" required>
-                            <option value="">Select Type</option>
-                            <option value="type_a">Type A</option>
-                            <option value="type_b">Type B</option>
-                        </select>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" required>
+                                <option value="">Select Category</option>
+                                <option value="1">Category 1</option>
+                                <option value="2">Category 2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="brand">Brand</label>
+                            <select id="brand" required>
+                                <option value="">Select Brand</option>
+                                <option value="1">Brand 1</option>
+                                <option value="2">Brand 2</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <select id="category" required>
-                            <option value="">Select Category</option>
-                            <option value="1">Category 1</option>
-                            <option value="2">Category 2</option>
-                        </select>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sku">SKU</label>
+                            <input type="text" id="sku" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="barcode">Barcode</label>
+                            <input type="text" id="barcode">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="brand">Brand</label>
-                        <select id="brand" required>
-                            <option value="">Select Brand</option>
-                            <option value="1">Brand X</option>
-                            <option value="2">Brand Y</option>
-                        </select>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="salesPrice">Sales Price</label>
+                            <input type="number" id="salesPrice" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchasePrice">Purchase Price</label>
+                            <input type="number" id="purchasePrice" step="0.01" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="salesPrice">Sales Price</label>
-                        <input type="number" id="salesPrice" required min="0" step="0.01">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="minStock">Minimum Stock</label>
+                            <input type="number" id="minStock" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="openingStock">Opening Stock</label>
+                            <input type="number" id="openingStock" min="0" value="0">
+                        </div>
                     </div>
+
                     <div class="form-group">
-                        <label for="purchasePrice">Purchase Price</label>
-                        <input type="number" id="purchasePrice" required min="0" step="0.01">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3"></textarea>
                     </div>
+
                     <div class="form-group">
-                        <label for="currentStock">Initial Stock</label>
-                        <input type="number" id="currentStock" required min="0">
+                        <label for="productImage">Product Image</label>
+                        <input type="file" id="productImage" accept="image/*">
                     </div>
+
                     <div class="dialog-actions">
                         <button type="button" class="btn-secondary" onclick="closeAddProductDialog()">Cancel</button>
                         <button type="submit" class="btn-primary">Save Product</button>
@@ -107,7 +145,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dialog functionality
     const dialog = document.getElementById('addProductDialog');
     
     window.openAddProductDialog = function() {
@@ -116,11 +153,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.closeAddProductDialog = function() {
         dialog.classList.remove('active');
+        document.getElementById('addProductForm').reset();
     };
 
     window.handleAddProduct = function(event) {
         event.preventDefault();
-        // Handle form submission here
         const formData = new FormData(event.target);
         // Add your logic to save the product
         closeAddProductDialog();
@@ -133,4 +170,67 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script> 
+</script>
+
+<style>
+.product-container {
+    padding: 20px;
+}
+
+.dialog-lg {
+    max-width: 1000px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 8px 0;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background: #6B7280;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #4B5563;
+}
+</style> 

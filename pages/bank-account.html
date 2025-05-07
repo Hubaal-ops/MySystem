@@ -1,0 +1,226 @@
+<div class="bank-account-container">
+    <div class="page-header">
+        <h1>Bank Accounts</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddAccountDialog()">
+                <i class="fas fa-plus"></i> Add Bank Account
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Account Name</th>
+                    <th>Bank Name</th>
+                    <th>Account Number</th>
+                    <th>Branch</th>
+                    <th>Current Balance</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="accountTableBody">
+                <tr>
+                    <td>Main Operating Account</td>
+                    <td>Example Bank</td>
+                    <td>1234567890</td>
+                    <td>Main Branch</td>
+                    <td>$50,000.00</td>
+                    <td><span class="badge badge-success">Active</span></td>
+                    <td>
+                        <button class="btn-link" onclick="viewAccountDetails('1')">View</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add/Edit Bank Account Dialog -->
+    <div class="dialog-overlay" id="accountDialog">
+        <div class="dialog dialog-lg">
+            <div class="dialog-header">
+                <h2 id="dialogTitle">New Bank Account</h2>
+                <button class="close-btn" onclick="closeAccountDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="accountForm" onsubmit="handleAccountSubmit(event)">
+                    <input type="hidden" id="accountAction" value="add">
+                    
+                    <!-- Basic Information -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="accountName">Account Name</label>
+                            <input type="text" id="accountName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bankName">Bank Name</label>
+                            <input type="text" id="bankName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="accountNumber">Account Number</label>
+                            <input type="text" id="accountNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="accountType">Account Type</label>
+                            <select id="accountType" required>
+                                <option value="">Select Type</option>
+                                <option value="checking">Checking</option>
+                                <option value="savings">Savings</option>
+                                <option value="current">Current</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="branch">Branch</label>
+                            <input type="text" id="branch" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="swiftCode">SWIFT Code</label>
+                            <input type="text" id="swiftCode">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="openingBalance">Opening Balance</label>
+                            <input type="number" id="openingBalance" required step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAccountDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dialog = document.getElementById('accountDialog');
+    
+    window.openAddAccountDialog = function() {
+        document.getElementById('dialogTitle').textContent = 'New Bank Account';
+        document.getElementById('accountAction').value = 'add';
+        document.getElementById('accountForm').reset();
+        dialog.classList.add('active');
+    };
+
+    window.closeAccountDialog = function() {
+        dialog.classList.remove('active');
+        document.getElementById('accountForm').reset();
+    };
+
+    window.handleAccountSubmit = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to save the account
+        closeAccountDialog();
+    };
+
+    // Close dialog when clicking outside
+    dialog.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAccountDialog();
+        }
+    });
+});
+</script>
+
+<style>
+.bank-account-container {
+    padding: 20px;
+}
+
+.dialog-lg {
+    max-width: 800px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.text-muted {
+    color: #6B7280;
+    font-size: 0.875rem;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background: #6B7280;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #4B5563;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: #10B981;
+    color: white;
+}
+</style> 

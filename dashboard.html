@@ -59,9 +59,9 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="submenu" id="purchases">
-                <a href="#"><i class="fas fa-list"></i> Purchases</a>
-                <a href="#"><i class="fas fa-undo"></i> Purchase Return</a>
-                <a href="#"><i class="fas fa-money-bill-wave"></i> Payment Out</a>
+                <a href="#purchase"><i class="fas fa-list"></i> Purchases</a>
+                <a href="#purchase-return"><i class="fas fa-undo"></i> Purchase Return</a>
+                <a href="#payment-out"><i class="fas fa-money-bill-wave"></i> Payment Out</a>
             </div>
 
             <div class="menu-item" data-submenu="stock">
@@ -69,8 +69,8 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="submenu" id="stock">
-                <a href="#"><i class="fas fa-exchange-alt"></i> Stock Transfer</a>
-                <a href="#"><i class="fas fa-balance-scale"></i> Stock Adjustment</a>
+                <a href="#stock-transfer"><i class="fas fa-exchange-alt"></i> Stock Transfer</a>
+                <a href="#stock-adjustment"><i class="fas fa-balance-scale"></i> Stock Adjustment</a>
             </div>
 
             <div class="menu-item" data-submenu="expenses">
@@ -78,16 +78,26 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="submenu" id="expenses">
-                <a href="#"><i class="fas fa-tags"></i> Expense category</a>
-                <a href="#"><i class="fas fa-file-invoice"></i> Expense</a>
+                <a href="#expense"><i class="fas fa-tags"></i> Expense category</a>
+                <a href="#expense"><i class="fas fa-file-invoice"></i> Expense</a>
             </div>
 
             <div class="menu-item" data-submenu="cashbank">
                 <span><i class="fas fa-university"></i> Cash and Bank</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="submenu" id="cashbank">
+                <a href="#bank-account"><i class="fas fa-university"></i> Bank Accounts</a>
+                <a href="#bank-deposit"><i class="fas fa-money-bill-wave"></i> Deposits</a>
+                <a href="#bank-transfer"><i class="fas fa-exchange-alt"></i> Transfers</a>
             </div>
 
             <div class="menu-item" data-submenu="employees">
                 <span><i class="fas fa-user-tie"></i> Employees</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="submenu" id="employees">
+                <a href="#employee"><i class="fas fa-users"></i> Employee List</a>
             </div>
 
             <div class="menu-item" data-submenu="reports">
@@ -131,6 +141,7 @@
             
             try {
                 let url;
+                const params = new URLSearchParams(window.location.search).get('id');
                 switch(page) {
                     case 'dashboard':
                         url = 'pages/dashboard-content.html';
@@ -156,8 +167,53 @@
                     case 'customer':
                         url = 'pages/customer.html';
                         break;
+                    case 'customer-detail':
+                        url = 'pages/customer-detail.html';
+                        if (params) {
+                            url += `?id=${params}`;
+                        }
+                        break;
                     case 'supplier':
                         url = 'pages/supplier.html';
+                        break;
+                    case 'supplier-detail':
+                        url = 'pages/supplier-detail.html';
+                        if (params) {
+                            url += `?id=${params}`;
+                        }
+                        break;
+                    case 'stock-transfer':
+                        url = 'pages/stock-transfer.html';
+                        break;
+                    case 'stock-adjustment':
+                        url = 'pages/stock-adjustment.html';
+                        break;
+                    case 'purchase':
+                        url = 'pages/purchase.html';
+                        break;
+                    case 'purchase-return':
+                        url = 'pages/purchase-return.html';
+                        break;
+                    case 'payment-out':
+                        url = 'pages/payment-out.html';
+                        break;
+                    case 'expense':
+                        url = 'pages/expense.html';
+                        break;
+                    case 'expense-category':
+                        url = 'pages/expense-category.html';
+                        break;
+                    case 'bank-account':
+                        url = 'pages/bank-account.html';
+                        break;
+                    case 'bank-deposit':
+                        url = 'pages/bank-deposit.html';
+                        break;
+                    case 'bank-transfer':
+                        url = 'pages/bank-transfer.html';
+                        break;
+                    case 'employee':
+                        url = 'pages/employee.html';
                         break;
                     case 'report-dashboard':
                         url = 'pages/reports/report-dashboard.html';
@@ -465,6 +521,192 @@
                 };
                 customerDialog.addEventListener('click', function(e) {
                     if (e.target === this) closeAddCustomerDialog();
+                });
+            }
+
+            // Bank Account dialog
+            const bankAccountDialog = document.getElementById('accountDialog');
+            if (bankAccountDialog) {
+                window.openAddAccountDialog = function() {
+                    document.getElementById('dialogTitle').textContent = 'New Bank Account';
+                    document.getElementById('accountAction').value = 'add';
+                    document.getElementById('accountForm').reset();
+                    bankAccountDialog.classList.add('active');
+                };
+                window.closeAccountDialog = function() {
+                    bankAccountDialog.classList.remove('active');
+                    document.getElementById('accountForm').reset();
+                };
+                window.handleAccountSubmit = function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(event.target);
+                    closeAccountDialog();
+                };
+                bankAccountDialog.addEventListener('click', function(e) {
+                    if (e.target === this) closeAccountDialog();
+                });
+            }
+
+            // Bank Deposit dialog
+            const bankDepositDialog = document.getElementById('depositDialog');
+            if (bankDepositDialog) {
+                window.openAddDepositDialog = function() {
+                    document.getElementById('dialogTitle').textContent = 'New Deposit';
+                    document.getElementById('depositAction').value = 'add';
+                    document.getElementById('reference').value = generateDepositReference();
+                    document.getElementById('depositDate').valueAsDate = new Date();
+                    document.getElementById('depositForm').reset();
+                    bankDepositDialog.classList.add('active');
+                };
+                window.closeDepositDialog = function() {
+                    bankDepositDialog.classList.remove('active');
+                    document.getElementById('depositForm').reset();
+                };
+                window.handleDepositSubmit = function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(event.target);
+                    closeDepositDialog();
+                };
+                window.generateDepositReference = function() {
+                    const date = new Date();
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                    return `DEP-${year}${month}-${random}`;
+                };
+                bankDepositDialog.addEventListener('click', function(e) {
+                    if (e.target === this) closeDepositDialog();
+                });
+            }
+
+            // Bank Transfer dialog
+            const bankTransferDialog = document.getElementById('transferDialog');
+            if (bankTransferDialog) {
+                window.openAddTransferDialog = function() {
+                    document.getElementById('dialogTitle').textContent = 'New Bank Transfer';
+                    document.getElementById('transferAction').value = 'add';
+                    document.getElementById('reference').value = generateTransferReference();
+                    document.getElementById('transferDate').valueAsDate = new Date();
+                    document.getElementById('transferForm').reset();
+                    bankTransferDialog.classList.add('active');
+                };
+                window.closeTransferDialog = function() {
+                    bankTransferDialog.classList.remove('active');
+                    document.getElementById('transferForm').reset();
+                };
+                window.handleTransferSubmit = function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(event.target);
+                    closeTransferDialog();
+                };
+                window.generateTransferReference = function() {
+                    const date = new Date();
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                    return `TRF-${year}${month}-${random}`;
+                };
+                window.updateToAccounts = function() {
+                    const fromAccount = document.getElementById('fromAccount').value;
+                    const toAccount = document.getElementById('toAccount');
+                    toAccount.innerHTML = '<option value="">Select Account</option>';
+                    
+                    // Get all accounts except the selected 'from' account
+                    const accounts = {
+                        '1': 'Main Operating Account',
+                        '2': 'Savings Account'
+                    };
+                    
+                    Object.entries(accounts).forEach(([id, name]) => {
+                        if (id !== fromAccount) {
+                            toAccount.add(new Option(name, id));
+                        }
+                    });
+
+                    // Update available balance
+                    document.getElementById('fromBalance').textContent = 
+                        `Available Balance: $${(Math.random() * 100000).toFixed(2)}`;
+                };
+                window.validateAmount = function() {
+                    const amount = parseFloat(document.getElementById('amount').value) || 0;
+                    const fee = parseFloat(document.getElementById('transferFee').value) || 0;
+                    const balance = parseFloat(document.getElementById('fromBalance').textContent
+                        .replace('Available Balance: $', '')) || 0;
+
+                    if (amount + fee > balance) {
+                        alert('Transfer amount exceeds available balance');
+                        document.getElementById('amount').value = '';
+                    }
+                };
+                bankTransferDialog.addEventListener('click', function(e) {
+                    if (e.target === this) closeTransferDialog();
+                });
+            }
+
+            // Employee dialog
+            const employeeDialog = document.getElementById('addEmployeeDialog');
+            const importDialog = document.getElementById('importDialog');
+            
+            if (employeeDialog) {
+                window.openAddEmployeeDialog = function() {
+                    document.getElementById('addEmployeeForm').reset();
+                    document.getElementById('joinDate').valueAsDate = new Date();
+                    employeeDialog.classList.add('active');
+                };
+                
+                window.closeAddEmployeeDialog = function() {
+                    employeeDialog.classList.remove('active');
+                    document.getElementById('addEmployeeForm').reset();
+                };
+                
+                window.handleAddEmployee = function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(event.target);
+                    // Add your logic to save the employee
+                    closeAddEmployeeDialog();
+                };
+                
+                window.editEmployee = function(employeeId) {
+                    // Populate form with employee data
+                    document.getElementById('addEmployeeForm').reset();
+                    employeeDialog.classList.add('active');
+                };
+                
+                window.viewEmployee = function(employeeId) {
+                    // Add view logic
+                    console.log('Viewing employee:', employeeId);
+                };
+                
+                window.toggleEmployeeStatus = function(employeeId) {
+                    // Add status toggle logic
+                    console.log('Toggling status for employee:', employeeId);
+                };
+                
+                employeeDialog.addEventListener('click', function(e) {
+                    if (e.target === this) closeAddEmployeeDialog();
+                });
+            }
+            
+            if (importDialog) {
+                window.openImportDialog = function() {
+                    document.getElementById('importForm').reset();
+                    importDialog.classList.add('active');
+                };
+                
+                window.closeImportDialog = function() {
+                    importDialog.classList.remove('active');
+                    document.getElementById('importForm').reset();
+                };
+                
+                window.handleImport = function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(event.target);
+                    // Add your import logic here
+                    closeImportDialog();
+                };
+                
+                importDialog.addEventListener('click', function(e) {
+                    if (e.target === this) closeImportDialog();
                 });
             }
         }

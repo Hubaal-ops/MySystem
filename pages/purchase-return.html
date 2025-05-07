@@ -1,0 +1,237 @@
+<div class="purchase-return-container">
+    <div class="page-header">
+        <h1>Purchase Returns</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddReturnDialog()">
+                <i class="fas fa-undo"></i> New Return
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Return ID</th>
+                    <th>Date</th>
+                    <th>PO Number</th>
+                    <th>Supplier</th>
+                    <th>Items</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="returnTableBody">
+                <tr>
+                    <td>RET-2024-001</td>
+                    <td>2024-02-25</td>
+                    <td>PO-2024-001</td>
+                    <td>Tech Supplies Inc</td>
+                    <td>2 items</td>
+                    <td>$1,600.00</td>
+                    <td><span class="badge badge-warning">Pending</span></td>
+                    <td>
+                        <button class="btn-link" onclick="viewReturnDetails('RET-2024-001')">View</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Return Dialog -->
+    <div class="dialog-overlay" id="addReturnDialog">
+        <div class="dialog dialog-lg">
+            <div class="dialog-header">
+                <h2>New Purchase Return</h2>
+                <button class="close-btn" onclick="closeAddReturnDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="addReturnForm" onsubmit="handleAddReturn(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="purchaseOrder">Purchase Order</label>
+                            <select id="purchaseOrder" required onchange="loadPurchaseItems()">
+                                <option value="">Select Purchase Order</option>
+                                <option value="PO-2024-001">PO-2024-001 - Tech Supplies Inc</option>
+                                <option value="PO-2024-002">PO-2024-002 - Global Imports Ltd</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="supplier">Supplier</label>
+                            <input type="text" id="supplier" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Return Items</label>
+                        <div class="return-items">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Received Qty</th>
+                                        <th>Return Qty</th>
+                                        <th>Unit Price</th>
+                                        <th>Reason</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="returnItemsBody">
+                                    <tr>
+                                        <td>Laptop Model X</td>
+                                        <td>5</td>
+                                        <td>
+                                            <input type="number" class="return-qty" min="1" max="5" onchange="calculateItemTotal(this.closest('tr'))">
+                                        </td>
+                                        <td class="unit-price">800.00</td>
+                                        <td>
+                                            <select class="return-reason" required>
+                                                <option value="">Select Reason</option>
+                                                <option value="defective">Defective</option>
+                                                <option value="damaged">Damaged in Transit</option>
+                                                <option value="wrong">Wrong Item</option>
+                                                <option value="quality">Quality Issues</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </td>
+                                        <td class="item-total">0.00</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="5" class="text-right"><strong>Total Return Amount:</strong></td>
+                                        <td id="totalReturn">0.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="returnType">Return Type</label>
+                            <select id="returnType" required>
+                                <option value="">Select Type</option>
+                                <option value="refund">Refund</option>
+                                <option value="replacement">Replacement</option>
+                                <option value="credit">Store Credit</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Additional Notes</label>
+                            <textarea id="notes" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAddReturnDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Submit Return</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dialog = document.getElementById('addReturnDialog');
+    
+    window.openAddReturnDialog = function() {
+        dialog.classList.add('active');
+    };
+
+    window.closeAddReturnDialog = function() {
+        dialog.classList.remove('active');
+    };
+
+    window.handleAddReturn = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to save the return
+        closeAddReturnDialog();
+    };
+
+    window.loadPurchaseItems = function() {
+        const purchaseOrder = document.getElementById('purchaseOrder').value;
+        // In a real application, you would fetch the purchase order details
+        // and populate the supplier and items
+        if (purchaseOrder === 'PO-2024-001') {
+            document.getElementById('supplier').value = 'Tech Supplies Inc';
+        } else if (purchaseOrder === 'PO-2024-002') {
+            document.getElementById('supplier').value = 'Global Imports Ltd';
+        }
+    };
+
+    window.calculateItemTotal = function(row) {
+        const returnQty = parseInt(row.querySelector('.return-qty').value) || 0;
+        const unitPrice = parseFloat(row.querySelector('.unit-price').textContent) || 0;
+        
+        const total = returnQty * unitPrice;
+        row.querySelector('.item-total').textContent = total.toFixed(2);
+        
+        calculateReturnTotal();
+    };
+
+    window.calculateReturnTotal = function() {
+        const itemTotals = Array.from(document.querySelectorAll('.item-total'))
+            .map(td => parseFloat(td.textContent) || 0);
+        
+        const total = itemTotals.reduce((sum, total) => sum + total, 0);
+        document.getElementById('totalReturn').textContent = total.toFixed(2);
+    };
+
+    window.viewReturnDetails = function(returnId) {
+        // Add your logic to view return details
+        console.log('Viewing return:', returnId);
+    };
+
+    // Close dialog when clicking outside
+    dialog.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAddReturnDialog();
+        }
+    });
+});
+</script>
+
+<style>
+.purchase-return-container {
+    padding: 20px;
+}
+
+.dialog-lg {
+    max-width: 900px;
+}
+
+.return-items {
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.return-qty {
+    width: 80px;
+}
+
+.return-reason {
+    width: 150px;
+}
+
+.unit-price,
+.item-total {
+    text-align: right;
+}
+
+.text-right {
+    text-align: right;
+}
+
+tfoot tr td {
+    font-weight: bold;
+}
+</style> 
