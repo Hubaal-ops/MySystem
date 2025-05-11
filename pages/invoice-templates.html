@@ -1,0 +1,590 @@
+<div class="invoice-templates-container">
+    <div class="page-header">
+        <h1>Invoice Templates</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddTemplateDialog()">
+                <i class="fas fa-plus"></i> New Template
+            </button>
+        </div>
+    </div>
+
+    <div class="template-grid">
+        <!-- Template Cards -->
+        <div class="template-card">
+            <div class="template-preview">
+                <img src="../images/bitmap.png" alt="Classic Template">
+                <div class="template-actions">
+                    <button class="btn-icon" onclick="previewTemplate('classic')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-icon" onclick="editTemplate('classic')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon" onclick="duplicateTemplate('classic')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="btn-icon" onclick="deleteTemplate('classic')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="template-info">
+                <h3>Classic Template</h3>
+                <p>Default business invoice template</p>
+                <span class="badge badge-success">Active</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Template Dialog -->
+    <div class="dialog-overlay" id="templateDialog">
+        <div class="dialog dialog-xl">
+            <div class="dialog-header">
+                <h2 id="dialogTitle">New Invoice Template</h2>
+                <button class="close-btn" onclick="closeTemplateDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="templateForm" onsubmit="handleTemplateSubmit(event)">
+                    <div class="template-editor">
+                        <!-- Template Settings -->
+                        <div class="settings-panel">
+                            <h3>Template Settings</h3>
+                            <div class="form-group">
+                                <label for="templateName">Template Name</label>
+                                <input type="text" id="templateName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="paperSize">Paper Size</label>
+                                <select id="paperSize" required>
+                                    <option value="a4">A4</option>
+                                    <option value="letter">Letter</option>
+                                    <option value="legal">Legal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="orientation">Orientation</label>
+                                <select id="orientation" required>
+                                    <option value="portrait">Portrait</option>
+                                    <option value="landscape">Landscape</option>
+                                </select>
+                            </div>
+
+                            <h3>Company Information</h3>
+                            <div class="form-group">
+                                <label>Logo Position</label>
+                                <div class="logo-position-selector">
+                                    <button type="button" class="position-btn active" data-position="top-left">
+                                        <i class="fas fa-arrow-up-left"></i>
+                                    </button>
+                                    <button type="button" class="position-btn" data-position="top-center">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                    <button type="button" class="position-btn" data-position="top-right">
+                                        <i class="fas fa-arrow-up-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Company Details Position</label>
+                                <select id="companyPosition">
+                                    <option value="header">Header</option>
+                                    <option value="footer">Footer</option>
+                                </select>
+                            </div>
+
+                            <h3>Color Scheme</h3>
+                            <div class="form-group">
+                                <label for="primaryColor">Primary Color</label>
+                                <input type="color" id="primaryColor" value="#3B82F6">
+                            </div>
+                            <div class="form-group">
+                                <label for="accentColor">Accent Color</label>
+                                <input type="color" id="accentColor" value="#10B981">
+                            </div>
+
+                            <h3>Content Sections</h3>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="showDueDate" checked>
+                                    Show Due Date
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="showPaymentInfo" checked>
+                                    Show Payment Information
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="showNotes" checked>
+                                    Show Notes Section
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="showTerms" checked>
+                                    Show Terms & Conditions
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Template Preview -->
+                        <div class="preview-panel">
+                            <h3>Preview</h3>
+                            <div class="template-preview-container">
+                                <div class="invoice-preview" id="previewContent">
+                                    <!-- Preview content will be dynamically updated -->
+                                    <div class="invoice-header">
+                                        <div class="company-logo">
+                                            <img src="../images/logo.png" alt="Company Logo">
+                                        </div>
+                                        <div class="company-info">
+                                            <h2>Business Name</h2>
+                                            <p>123 Business Street</p>
+                                            <p>City, State, ZIP</p>
+                                            <p>Phone: (123) 456-7890</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="invoice-body">
+                                        <div class="invoice-details">
+                                            <h1>INVOICE</h1>
+                                            <div class="details-grid">
+                                                <div>
+                                                    <strong>Invoice #:</strong>
+                                                    <span>INV-2024001</span>
+                                                </div>
+                                                <div>
+                                                    <strong>Date:</strong>
+                                                    <span>2024-02-25</span>
+                                                </div>
+                                                <div class="due-date">
+                                                    <strong>Due Date:</strong>
+                                                    <span>2024-03-25</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="party-details">
+                                            <div class="bill-to">
+                                                <h3>Bill To:</h3>
+                                                <p>Customer Name</p>
+                                                <p>Customer Address</p>
+                                                <p>City, State, ZIP</p>
+                                            </div>
+                                            <div class="ship-to">
+                                                <h3>Ship To:</h3>
+                                                <p>Shipping Name</p>
+                                                <p>Shipping Address</p>
+                                                <p>City, State, ZIP</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="items-table">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Description</th>
+                                                        <th>Quantity</th>
+                                                        <th>Price</th>
+                                                        <th>Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Item 1</td>
+                                                        <td>Sample product description</td>
+                                                        <td>2</td>
+                                                        <td>$100.00</td>
+                                                        <td>$200.00</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="totals-section">
+                                            <div class="totals-table">
+                                                <div class="total-row">
+                                                    <span>Subtotal:</span>
+                                                    <span>$200.00</span>
+                                                </div>
+                                                <div class="total-row">
+                                                    <span>Tax (10%):</span>
+                                                    <span>$20.00</span>
+                                                </div>
+                                                <div class="total-row grand-total">
+                                                    <span>Total:</span>
+                                                    <span>$220.00</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="payment-info">
+                                            <h3>Payment Information</h3>
+                                            <p>Bank: Example Bank</p>
+                                            <p>Account: 1234567890</p>
+                                            <p>Swift: EXAMPEXXX</p>
+                                        </div>
+
+                                        <div class="notes-section">
+                                            <h3>Notes</h3>
+                                            <p>Thank you for your business!</p>
+                                        </div>
+
+                                        <div class="terms-section">
+                                            <h3>Terms & Conditions</h3>
+                                            <p>Payment is due within 30 days.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="invoice-footer">
+                                        <div class="footer-content">
+                                            <p>www.businessname.com | email@businessname.com</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dialog-actions">
+                        <button type="button" class="btn-secondary" onclick="closeTemplateDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Template</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.invoice-templates-container {
+    padding: 20px;
+}
+
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.template-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.template-preview {
+    position: relative;
+    padding-top: 141.4%; /* A4 aspect ratio */
+    background: #f3f4f6;
+}
+
+.template-preview img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.template-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.template-preview:hover .template-actions {
+    opacity: 1;
+}
+
+.template-info {
+    padding: 15px;
+}
+
+.template-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+}
+
+.template-info p {
+    margin: 0 0 10px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.dialog-xl {
+    max-width: 1200px;
+    width: 90%;
+    height: 90vh;
+}
+
+.template-editor {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    height: calc(90vh - 150px);
+    overflow: hidden;
+}
+
+.settings-panel {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-y: auto;
+}
+
+.settings-panel h3 {
+    margin: 20px 0 10px 0;
+    font-size: 16px;
+    color: #374151;
+}
+
+.settings-panel h3:first-child {
+    margin-top: 0;
+}
+
+.preview-panel {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-y: auto;
+}
+
+.template-preview-container {
+    background: #f3f4f6;
+    padding: 20px;
+    border-radius: 4px;
+}
+
+.invoice-preview {
+    background: #fff;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo-position-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.position-btn {
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.position-btn.active {
+    background: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+}
+
+/* Invoice Preview Styles */
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.company-logo img {
+    max-width: 200px;
+    height: auto;
+}
+
+.company-info {
+    text-align: right;
+}
+
+.invoice-details {
+    margin-bottom: 30px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.party-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.items-table {
+    margin-bottom: 30px;
+}
+
+.items-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.items-table th,
+.items-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.items-table th {
+    background: #f9fafb;
+}
+
+.totals-section {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 30px;
+}
+
+.totals-table {
+    width: 300px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+.grand-total {
+    font-weight: bold;
+    border-top: 2px solid #e5e7eb;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.payment-info,
+.notes-section,
+.terms-section {
+    margin-bottom: 20px;
+}
+
+.invoice-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    color: #6b7280;
+}
+
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.dialog-overlay.active {
+    display: flex;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const templateDialog = document.getElementById('templateDialog');
+    
+    window.openAddTemplateDialog = function() {
+        document.getElementById('dialogTitle').textContent = 'New Invoice Template';
+        document.getElementById('templateForm').reset();
+        templateDialog.classList.add('active');
+        updatePreview();
+    };
+    
+    window.closeTemplateDialog = function() {
+        templateDialog.classList.remove('active');
+        document.getElementById('templateForm').reset();
+    };
+    
+    window.handleTemplateSubmit = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add logic to save the template
+        closeTemplateDialog();
+    };
+    
+    window.previewTemplate = function(templateId) {
+        // Add logic to preview template
+        console.log('Previewing template:', templateId);
+    };
+    
+    window.editTemplate = function(templateId) {
+        document.getElementById('dialogTitle').textContent = 'Edit Invoice Template';
+        // Add logic to load template data
+        templateDialog.classList.add('active');
+    };
+    
+    window.duplicateTemplate = function(templateId) {
+        // Add logic to duplicate template
+        console.log('Duplicating template:', templateId);
+    };
+    
+    window.deleteTemplate = function(templateId) {
+        if (confirm('Are you sure you want to delete this template?')) {
+            // Add logic to delete template
+            console.log('Deleting template:', templateId);
+        }
+    };
+
+    // Update preview when settings change
+    document.querySelectorAll('#templateForm input, #templateForm select').forEach(input => {
+        input.addEventListener('change', updatePreview);
+    });
+
+    // Logo position buttons
+    document.querySelectorAll('.position-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.position-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            updatePreview();
+        });
+    });
+
+    function updatePreview() {
+        const primaryColor = document.getElementById('primaryColor').value;
+        const accentColor = document.getElementById('accentColor').value;
+        const showDueDate = document.getElementById('showDueDate').checked;
+        const showPaymentInfo = document.getElementById('showPaymentInfo').checked;
+        const showNotes = document.getElementById('showNotes').checked;
+        const showTerms = document.getElementById('showTerms').checked;
+
+        // Update preview styles
+        const preview = document.getElementById('previewContent');
+        preview.style.setProperty('--primary-color', primaryColor);
+        preview.style.setProperty('--accent-color', accentColor);
+
+        // Toggle sections
+        preview.querySelector('.due-date').style.display = showDueDate ? 'block' : 'none';
+        preview.querySelector('.payment-info').style.display = showPaymentInfo ? 'block' : 'none';
+        preview.querySelector('.notes-section').style.display = showNotes ? 'block' : 'none';
+        preview.querySelector('.terms-section').style.display = showTerms ? 'block' : 'none';
+    }
+
+    // Initialize preview
+    updatePreview();
+});
+</script> 

@@ -52,6 +52,7 @@
                 <a href="#sales-return"><i class="fas fa-undo"></i> Sales Return</a>
                 <a href="#payment-in"><i class="fas fa-money-bill"></i> Payment In</a>
                 <a href="#sales-estimate"><i class="fas fa-file-invoice"></i> Estimation</a>
+                <a href="#invoice-templates"><i class="fas fa-file-alt"></i> Invoice Templates</a>
             </div>
 
             <div class="menu-item" data-submenu="purchases">
@@ -250,6 +251,12 @@
                         break;
                     case 'report-invoice':
                         url = 'pages/reports/report-invoice.html';
+                        break;
+                    case 'sales-estimate':
+                        url = 'pages/sales-estimate.html';
+                        break;
+                    case 'invoice-templates':
+                        url = 'pages/invoice-templates.html';
                         break;
                     default:
                         url = `pages/${page}.html`;
@@ -707,6 +714,75 @@
                 
                 importDialog.addEventListener('click', function(e) {
                     if (e.target === this) closeImportDialog();
+                });
+            }
+
+            // Template dialog
+            const templateDialog = document.getElementById('templateDialog');
+            if (templateDialog) {
+                window.openAddTemplateDialog = function() {
+                    document.getElementById('dialogTitle').textContent = 'New Invoice Template';
+                    document.getElementById('templateForm').reset();
+                    templateDialog.classList.add('active');
+                    updatePreview();
+                };
+                
+                window.closeTemplateDialog = function() {
+                    templateDialog.classList.remove('active');
+                    document.getElementById('templateForm').reset();
+                };
+                
+                window.handleTemplateSubmit = function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(event.target);
+                    // Add logic to save the template
+                    closeTemplateDialog();
+                };
+                
+                templateDialog.addEventListener('click', function(e) {
+                    if (e.target === this) closeTemplateDialog();
+                });
+
+                // Initialize preview functionality
+                const updatePreview = function() {
+                    const primaryColor = document.getElementById('primaryColor')?.value || '#3B82F6';
+                    const accentColor = document.getElementById('accentColor')?.value || '#10B981';
+                    const showDueDate = document.getElementById('showDueDate')?.checked || true;
+                    const showPaymentInfo = document.getElementById('showPaymentInfo')?.checked || true;
+                    const showNotes = document.getElementById('showNotes')?.checked || true;
+                    const showTerms = document.getElementById('showTerms')?.checked || true;
+
+                    const preview = document.getElementById('previewContent');
+                    if (preview) {
+                        preview.style.setProperty('--primary-color', primaryColor);
+                        preview.style.setProperty('--accent-color', accentColor);
+
+                        const dueDate = preview.querySelector('.due-date');
+                        if (dueDate) dueDate.style.display = showDueDate ? 'block' : 'none';
+
+                        const paymentInfo = preview.querySelector('.payment-info');
+                        if (paymentInfo) paymentInfo.style.display = showPaymentInfo ? 'block' : 'none';
+
+                        const notes = preview.querySelector('.notes-section');
+                        if (notes) notes.style.display = showNotes ? 'block' : 'none';
+
+                        const terms = preview.querySelector('.terms-section');
+                        if (terms) terms.style.display = showTerms ? 'block' : 'none';
+                    }
+                };
+
+                // Add event listeners for template settings
+                document.querySelectorAll('#templateForm input, #templateForm select').forEach(input => {
+                    input.addEventListener('change', updatePreview);
+                });
+
+                // Logo position buttons
+                document.querySelectorAll('.position-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.position-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        updatePreview();
+                    });
                 });
             }
         }

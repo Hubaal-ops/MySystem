@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Subscriptions - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: #1e40af;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 20px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h1 {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #4b5563;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        /* Subscription Plans Section */
+        .plans-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .plan-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .plan-card.active {
+            border-color: #1e40af;
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .plan-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .plan-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .plan-price small {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .plan-features li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+
+        .plan-features i {
+            color: #10b981;
+        }
+
+        /* Subscriptions List */
+        .subscriptions-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .list-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            width: 300px;
+        }
+
+        .filter-dropdown {
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-expired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1e40af;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: opacity 0.2s;
+        }
+
+        .btn-icon:hover {
+            opacity: 0.9;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+        }
+
+        .btn-view {
+            background: #10b981;
+        }
+
+        /* Dialog Styles */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .dialog-overlay.active {
+            display: flex;
+        }
+
+        .dialog {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .dialog-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dialog-content {
+            padding: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .dialog-actions {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="businesses.html" class="nav-item">
+                <i class="fas fa-building"></i> Businesses
+            </a>
+            <a href="users.html" class="nav-item">
+                <i class="fas fa-users"></i> Users
+            </a>
+            <a href="subscriptions.html" class="nav-item active">
+                <i class="fas fa-credit-card"></i> Subscriptions
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <a href="reports.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a>
+            <a href="audit-logs.html" class="nav-item">
+                <i class="fas fa-history"></i> Audit Logs
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Revenue</h3>
+                <div class="value">$12,450</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Subscriptions</h3>
+                <div class="value">245</div>
+            </div>
+            <div class="stat-card">
+                <h3>Monthly Growth</h3>
+                <div class="value">+15%</div>
+            </div>
+            <div class="stat-card">
+                <h3>Churn Rate</h3>
+                <div class="value">2.3%</div>
+            </div>
+        </div>
+
+        <!-- Subscription Plans -->
+        <div class="plans-section">
+            <div class="section-header">
+                <h2>Subscription Plans</h2>
+                <button class="btn btn-primary" onclick="openAddPlanDialog()">
+                    <i class="fas fa-plus"></i> Add Plan
+                </button>
+            </div>
+            <div class="plans-grid">
+                <div class="plan-card active">
+                    <div class="plan-header">
+                        <h3 class="plan-name">Basic</h3>
+                        <div class="plan-price">$29<small>/mo</small></div>
+                    </div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Up to 5 users</li>
+                        <li><i class="fas fa-check"></i> Basic reporting</li>
+                        <li><i class="fas fa-check"></i> 5GB storage</li>
+                        <li><i class="fas fa-check"></i> Email support</li>
+                    </ul>
+                    <button class="btn btn-secondary" onclick="openEditPlanDialog('basic')">Edit Plan</button>
+                </div>
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <h3 class="plan-name">Professional</h3>
+                        <div class="plan-price">$79<small>/mo</small></div>
+                    </div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Up to 20 users</li>
+                        <li><i class="fas fa-check"></i> Advanced reporting</li>
+                        <li><i class="fas fa-check"></i> 20GB storage</li>
+                        <li><i class="fas fa-check"></i> Priority support</li>
+                    </ul>
+                    <button class="btn btn-secondary" onclick="openEditPlanDialog('pro')">Edit Plan</button>
+                </div>
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <h3 class="plan-name">Enterprise</h3>
+                        <div class="plan-price">$199<small>/mo</small></div>
+                    </div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Unlimited users</li>
+                        <li><i class="fas fa-check"></i> Custom reporting</li>
+                        <li><i class="fas fa-check"></i> 100GB storage</li>
+                        <li><i class="fas fa-check"></i> 24/7 support</li>
+                    </ul>
+                    <button class="btn btn-secondary" onclick="openEditPlanDialog('enterprise')">Edit Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscriptions List -->
+        <div class="subscriptions-section">
+            <div class="list-header">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search subscriptions...">
+                    <select class="filter-dropdown">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="expired">Expired</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Business</th>
+                        <th>Plan</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Tech Solutions Inc</td>
+                        <td>Professional</td>
+                        <td>2024-01-01</td>
+                        <td>2024-12-31</td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>$79/mo</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-view" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" title="Cancel">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Global Traders</td>
+                        <td>Basic</td>
+                        <td>2024-02-01</td>
+                        <td>2024-02-29</td>
+                        <td><span class="status-badge status-expired">Expired</span></td>
+                        <td>$29/mo</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-view" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" title="Cancel">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Plan Dialog -->
+    <div class="dialog-overlay" id="planDialog">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h2 id="dialogTitle">Add New Plan</h2>
+                <button class="btn-icon" onclick="closePlanDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <form id="planForm" onsubmit="handlePlanSubmit(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="planName">Plan Name</label>
+                            <input type="text" id="planName" name="planName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Monthly Price ($)</label>
+                            <input type="number" id="price" name="price" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxUsers">Max Users</label>
+                            <input type="number" id="maxUsers" name="maxUsers" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="storage">Storage (GB)</label>
+                            <input type="number" id="storage" name="storage" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="features">Features (one per line)</label>
+                        <textarea id="features" name="features" required></textarea>
+                    </div>
+                    <div class="dialog-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closePlanDialog()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Plan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dialog Functions
+        function openAddPlanDialog() {
+            document.getElementById('planDialog').classList.add('active');
+            document.getElementById('dialogTitle').textContent = 'Add New Plan';
+            document.getElementById('planForm').reset();
+        }
+
+        function openEditPlanDialog(planId) {
+            document.getElementById('planDialog').classList.add('active');
+            document.getElementById('dialogTitle').textContent = 'Edit Plan';
+            
+            // Load plan data based on planId
+            const planData = {
+                basic: {
+                    name: 'Basic',
+                    price: 29,
+                    maxUsers: 5,
+                    storage: 5,
+                    features: 'Up to 5 users\nBasic reporting\n5GB storage\nEmail support'
+                },
+                pro: {
+                    name: 'Professional',
+                    price: 79,
+                    maxUsers: 20,
+                    storage: 20,
+                    features: 'Up to 20 users\nAdvanced reporting\n20GB storage\nPriority support'
+                },
+                enterprise: {
+                    name: 'Enterprise',
+                    price: 199,
+                    maxUsers: 999,
+                    storage: 100,
+                    features: 'Unlimited users\nCustom reporting\n100GB storage\n24/7 support'
+                }
+            };
+
+            const plan = planData[planId];
+            if (plan) {
+                document.getElementById('planName').value = plan.name;
+                document.getElementById('price').value = plan.price;
+                document.getElementById('maxUsers').value = plan.maxUsers;
+                document.getElementById('storage').value = plan.storage;
+                document.getElementById('features').value = plan.features;
+            }
+        }
+
+        function closePlanDialog() {
+            document.getElementById('planDialog').classList.remove('active');
+        }
+
+        function handlePlanSubmit(event) {
+            event.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(event.target);
+            const planData = Object.fromEntries(formData.entries());
+            
+            console.log('Plan Data:', planData);
+            
+            // Add the new plan to the grid
+            addPlanToGrid(planData);
+            
+            // Close the dialog
+            closePlanDialog();
+        }
+
+        function addPlanToGrid(plan) {
+            const plansGrid = document.querySelector('.plans-grid');
+            const planCard = document.createElement('div');
+            planCard.className = 'plan-card';
+            
+            const features = plan.features.split('\n').map(feature => 
+                `<li><i class="fas fa-check"></i> ${feature}</li>`
+            ).join('');
+            
+            planCard.innerHTML = `
+                <div class="plan-header">
+                    <h3 class="plan-name">${plan.planName}</h3>
+                    <div class="plan-price">$${plan.price}<small>/mo</small></div>
+                </div>
+                <ul class="plan-features">
+                    ${features}
+                </ul>
+                <button class="btn btn-secondary" onclick="openEditPlanDialog('${plan.planName.toLowerCase()}')">
+                    Edit Plan
+                </button>
+            `;
+            
+            plansGrid.appendChild(planCard);
+        }
+
+        // Search and Filter Functions
+        document.querySelector('.search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        document.querySelector('.filter-dropdown').addEventListener('change', function(e) {
+            const status = e.target.value;
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                if (status === 'all') {
+                    row.style.display = '';
+                } else {
+                    const rowStatus = row.querySelector('.status-badge').textContent.toLowerCase();
+                    row.style.display = rowStatus === status ? '' : 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
