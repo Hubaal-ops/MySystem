@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stores Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Include your existing admin panel styles */
+        
+        .stores-container {
+            padding: 20px;
+        }
+
+        .stores-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stores-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stores-table th, .stores-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stores-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .btn-add {
+            background: #4040ff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .store-form {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include your existing sidebar here -->
+
+    <div class="stores-container">
+        <div class="stores-header">
+            <h2>Stores Management</h2>
+            <button class="btn-add" onclick="showStoreForm()">
+                <i class="fas fa-plus"></i> Add Store
+            </button>
+        </div>
+
+        <table class="stores-table">
+            <thead>
+                <tr>
+                    <th>Store ID</th>
+                    <th>Store Name</th>
+                    <th>Location</th>
+                    <th>Manager</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="storesTableBody">
+                <!-- Stores will be populated here -->
+            </tbody>
+        </table>
+
+        <!-- Store Form -->
+        <div id="storeForm" class="store-form">
+            <h3>Add New Store</h3>
+            <form onsubmit="handleStoreSubmit(event)">
+                <div class="form-group">
+                    <label>Store Name</label>
+                    <input type="text" id="storeName" required>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="location" required>
+                </div>
+                <div class="form-group">
+                    <label>Manager</label>
+                    <input type="text" id="manager" required>
+                </div>
+                <button type="submit" class="btn-add">Save Store</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let stores = JSON.parse(localStorage.getItem('stores')) || [];
+
+        function showStoreForm() {
+            document.getElementById('storeForm').style.display = 'block';
+        }
+
+        function handleStoreSubmit(event) {
+            event.preventDefault();
+            const store = {
+                id: Date.now(),
+                name: document.getElementById('storeName').value,
+                location: document.getElementById('location').value,
+                manager: document.getElementById('manager').value
+            };
+            stores.push(store);
+            localStorage.setItem('stores', JSON.stringify(stores));
+            displayStores();
+            document.getElementById('storeForm').style.display = 'none';
+            event.target.reset();
+        }
+
+        function displayStores() {
+            const tbody = document.getElementById('storesTableBody');
+            tbody.innerHTML = stores.map(store => `
+                <tr>
+                    <td>${store.id}</td>
+                    <td>${store.name}</td>
+                    <td>${store.location}</td>
+                    <td>${store.manager}</td>
+                    <td>
+                        <a href="store-details.html?id=${store.id}" class="btn-view">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <button onclick="deleteStore(${store.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteStore(id) {
+            if(confirm('Are you sure you want to delete this store?')) {
+                stores = stores.filter(store => store.id !== id);
+                localStorage.setItem('stores', JSON.stringify(stores));
+                displayStores();
+            }
+        }
+
+        // Load stores when page loads
+        displayStores();
+    </script>
+</body>
+</html> 
