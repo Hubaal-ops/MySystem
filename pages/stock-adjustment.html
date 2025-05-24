@@ -67,20 +67,18 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="location">Location</label>
-                            <select id="location" required>
-                                <option value="">Select Location</option>
-                                <option value="main">Main Warehouse</option>
-                                <option value="store1">Store 1</option>
-                                <option value="store2">Store 2</option>
+                            <label for="store_no">Store</label>
+                            <select id="store_no" required>
+                                <option value="">Select Store</option>
+                                <!-- Stores will be loaded dynamically from database -->
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="adjustmentType">Adjustment Type</label>
-                            <select id="adjustmentType" required>
+                            <label for="adj_type">Adjustment Type</label>
+                            <select id="adj_type" required>
                                 <option value="">Select Type</option>
-                                <option value="increase">Increase</option>
-                                <option value="decrease">Decrease</option>
+                                <option value="Add">Add</option>
+                                <option value="Subtract">Subtract</option>
                             </select>
                         </div>
                     </div>
@@ -106,26 +104,29 @@
                         </button>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="reason">Reason</label>
-                            <select id="reason" required>
-                                <option value="">Select Reason</option>
-                                <option value="damaged">Damaged Goods</option>
-                                <option value="expired">Expired</option>
-                                <option value="lost">Lost/Missing</option>
-                                <option value="found">Found</option>
-                                <option value="correction">Stock Correction</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <select id="status" required>
-                                <option value="draft">Draft</option>
-                                <option value="pending">Pending Approval</option>
-                                <option value="approved">Approved</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label for="adj_desc">Adjustment Description</label>
+                        <textarea id="adj_desc" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reason">Reason</label>
+                        <select id="reason" required>
+                            <option value="">Select Reason</option>
+                            <option value="damaged">Damaged Goods</option>
+                            <option value="expired">Expired</option>
+                            <option value="lost">Lost/Missing</option>
+                            <option value="found">Found</option>
+                            <option value="correction">Stock Correction</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" required>
+                            <option value="draft">Draft</option>
+                            <option value="pending">Pending Approval</option>
+                            <option value="approved">Approved</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -210,10 +211,10 @@ document.addEventListener('DOMContentLoaded', function() {
     window.updateNewStock = function(input) {
         const row = input.closest('tr');
         const currentStock = parseInt(row.querySelector('.current-stock').textContent);
-        const adjustmentType = document.getElementById('adjustmentType').value;
+        const adjustmentType = document.getElementById('adj_type').value;
         const adjustmentQty = parseInt(input.value) || 0;
         
-        const newStock = adjustmentType === 'increase' 
+        const newStock = adjustmentType === 'Add' 
             ? currentStock + adjustmentQty 
             : currentStock - adjustmentQty;
             
@@ -238,6 +239,23 @@ document.addEventListener('DOMContentLoaded', function() {
             closeAdjustmentDialog();
         }
     });
+
+    // Add this function to load stores from database
+    function loadStores() {
+        // This would typically be an AJAX call to your backend
+        fetch('/api/stores')
+            .then(response => response.json())
+            .then(stores => {
+                const storeSelect = document.getElementById('store_no');
+                storeSelect.innerHTML = '<option value="">Select Store</option>';
+                stores.forEach(store => {
+                    storeSelect.innerHTML += `<option value="${store.store_no}">${store.store_name}</option>`;
+                });
+            });
+    }
+
+    // Call loadStores when page loads
+    document.addEventListener('DOMContentLoaded', loadStores);
 });
 </script>
 

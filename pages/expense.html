@@ -81,43 +81,27 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="expenseCategory">Category</label>
-                            <select id="expenseCategory" required>
+                            <label for="exp_cat_id">Category</label>
+                            <select id="exp_cat_id" required>
                                 <option value="">Select Category</option>
-                                <option value="office">Office Supplies</option>
-                                <option value="utilities">Utilities</option>
-                                <option value="rent">Rent</option>
-                                <option value="salary">Salary</option>
+                                <!-- Categories will be loaded dynamically from database -->
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="expenseAmount">Amount</label>
-                            <input type="number" id="expenseAmount" step="0.01" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="paymentMethod">Payment Method</label>
-                            <select id="paymentMethod" required>
-                                <option value="">Select Method</option>
-                                <option value="cash">Cash</option>
-                                <option value="bank">Bank Transfer</option>
-                                <option value="card">Credit Card</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="paymentAccount">Payment Account</label>
-                            <select id="paymentAccount" required>
-                                <option value="">Select Account</option>
-                                <option value="cash">Cash Account</option>
-                                <option value="bank1">Bank Account 1</option>
-                                <option value="bank2">Bank Account 2</option>
-                            </select>
+                            <label for="amount">Amount</label>
+                            <input type="number" id="amount" step="0.01" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="expenseDescription">Description</label>
-                        <textarea id="expenseDescription" rows="3" required></textarea>
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="account_id">Account</label>
+                        <select id="account_id" required>
+                            <option value="">Select Account</option>
+                            <!-- Accounts will be loaded dynamically from database -->
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="expenseAttachment">Attachment</label>
@@ -157,10 +141,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (row) {
             document.getElementById('expenseReference').value = expenseId;
             document.getElementById('expenseDate').value = row.cells[0].textContent;
-            document.getElementById('expenseCategory').value = row.cells[2].textContent.toLowerCase();
-            document.getElementById('expenseDescription').value = row.cells[3].textContent;
-            document.getElementById('expenseAmount').value = row.cells[4].textContent.replace('$', '');
-            document.getElementById('paymentMethod').value = row.cells[5].textContent.toLowerCase();
+            document.getElementById('exp_cat_id').value = row.cells[2].textContent.toLowerCase();
+            document.getElementById('description').value = row.cells[3].textContent;
+            document.getElementById('amount').value = row.cells[4].textContent.replace('$', '');
+            document.getElementById('account_id').value = row.cells[5].textContent.toLowerCase();
         }
         expenseDialog.classList.add('active');
     };
@@ -176,11 +160,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = {
             date: document.getElementById('expenseDate').value,
             reference: document.getElementById('expenseReference').value,
-            category: document.getElementById('expenseCategory').value,
-            description: document.getElementById('expenseDescription').value,
-            amount: document.getElementById('expenseAmount').value,
-            paymentMethod: document.getElementById('paymentMethod').value,
-            paymentAccount: document.getElementById('paymentAccount').value
+            category: document.getElementById('exp_cat_id').value,
+            description: document.getElementById('description').value,
+            amount: document.getElementById('amount').value,
+            paymentMethod: document.getElementById('account_id').value,
+            paymentAccount: document.getElementById('account_id').value
         };
 
         if (action === 'add') {
@@ -258,6 +242,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 menu.classList.remove('active');
             });
         }
+    });
+
+    // Add these functions to load data from database
+    function loadExpenseCategories() {
+        // This would typically be an AJAX call to your backend
+        fetch('/api/expense-categories')
+            .then(response => response.json())
+            .then(categories => {
+                const categorySelect = document.getElementById('exp_cat_id');
+                categorySelect.innerHTML = '<option value="">Select Category</option>';
+                categories.forEach(category => {
+                    categorySelect.innerHTML += `<option value="${category.exp_cat_id}">${category.exp_cat_name}</option>`;
+                });
+            });
+    }
+
+    function loadAccounts() {
+        // This would typically be an AJAX call to your backend
+        fetch('/api/accounts')
+            .then(response => response.json())
+            .then(accounts => {
+                const accountSelect = document.getElementById('account_id');
+                accountSelect.innerHTML = '<option value="">Select Account</option>';
+                accounts.forEach(account => {
+                    accountSelect.innerHTML += `<option value="${account.id}">${account.account_name}</option>`;
+                });
+            });
+    }
+
+    // Call load functions when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        loadExpenseCategories();
+        loadAccounts();
     });
 });
 </script>
