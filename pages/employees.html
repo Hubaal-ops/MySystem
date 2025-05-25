@@ -1,9 +1,9 @@
 <div class="container">
     <div class="page-header">
-        <h1>Bank Deposits</h1>
+        <h1>Employees</h1>
         <div class="header-actions">
-            <button class="btn-primary" onclick="openAddDepositDialog()">
-                <i class="fas fa-plus"></i> Add Deposit
+            <button class="btn-primary" onclick="openAddEmployeeDialog()">
+                <i class="fas fa-plus"></i> Add Employee
             </button>
         </div>
     </div>
@@ -12,51 +12,56 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Account ID</th>
-                    <th>Amount</th>
-                    <th>Deposit Date</th>
+                    <th>Employee No</th>
+                    <th>Employee Name</th>
+                    <th>Position</th>
+                    <th>Hire Date</th>
+                    <th>Updated At</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="depositTableBody">
-                <!-- Deposit rows will be added dynamically -->
+            <tbody id="employeeTableBody">
+                <!-- Employee rows will be added dynamically -->
             </tbody>
         </table>
     </div>
 
-    <!-- Add Deposit Dialog -->
-    <div class="dialog-overlay" id="addDepositDialog">
+    <!-- Add Employee Dialog -->
+    <div class="dialog-overlay" id="addEmployeeDialog">
         <div class="dialog">
             <div class="dialog-header">
-                <h2>New Bank Deposit</h2>
-                <button class="close-btn" onclick="closeAddDepositDialog()">
+                <h2>New Employee</h2>
+                <button class="close-btn" onclick="closeAddEmployeeDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
-                <form id="addDepositForm" onsubmit="handleAddDeposit(event)">
-                    <div class="form-group">
-                        <label for="account-id">Account</label>
-                        <select id="account-id" name="account-id" required>
-                            <option value="">Select Account</option>
-                            <!-- Account options will be loaded dynamically -->
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="amount">Amount</label>
-                        <input type="number" id="amount" name="amount" min="0" step="0.01" required>
-                    </div>
-
+                <form id="addEmployeeForm" onsubmit="handleAddEmployee(event)">
                      <div class="form-group">
-                        <label for="deposit-date">Deposit Date</label>
-                        <input type="date" id="deposit-date" name="deposit-date" required>
+                        <label for="emp-no">Employee No</label>
+                        <input type="text" id="emp-no" name="emp-no" required>
                     </div>
+
+                    <div class="form-group">
+                        <label for="emp-name">Employee Name</label>
+                        <input type="text" id="emp-name" name="emp-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="position">Position</label>
+                        <input type="text" id="position" name="position" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hire-date">Hire Date</label>
+                        <input type="date" id="hire-date" name="hire-date" required>
+                    </div>
+
+                    <!-- Updated At will be set by the system -->
 
                     <div class="dialog-actions">
-                        <button type="button" class="btn-secondary" onclick="closeAddDepositDialog()">Cancel</button>
-                        <button type="submit" class="btn-primary">Save Deposit</button>
+                        <button type="button" class="btn-secondary" onclick="closeAddEmployeeDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Employee</button>
                     </div>
                 </form>
             </div>
@@ -65,79 +70,61 @@
 </div>
 
 <script>
-// Initialize deposit dialog functionality
+// Initialize employee dialog functionality
 (function() {
     // Make functions globally available immediately
-    window.openAddDepositDialog = function() {
-        console.log('Opening deposit dialog...');
-        const dialog = document.getElementById('addDepositDialog');
+    window.openAddEmployeeDialog = function() {
+        console.log('Attempting to open employee dialog...');
+        const dialog = document.getElementById('addEmployeeDialog');
         if (dialog) {
+            console.log('Employee dialog found, adding active class.');
             dialog.classList.add('active');
         } else {
-            console.error('Deposit dialog element not found!');
+            console.error('Employee dialog element not found!');
         }
     };
 
-    window.closeAddDepositDialog = function() {
-        console.log('Closing deposit dialog...');
-        const dialog = document.getElementById('addDepositDialog');
+    window.closeAddEmployeeDialog = function() {
+        console.log('Attempting to close employee dialog...');
+        const dialog = document.getElementById('addEmployeeDialog');
         if (dialog) {
+            console.log('Employee dialog found, removing active class and resetting form.');
             dialog.classList.remove('active');
-            const form = document.getElementById('addDepositForm');
+            const form = document.getElementById('addEmployeeForm');
             if (form) form.reset();
+        } else {
+            console.error('Employee dialog element not found on close!');
         }
     };
 
-    window.handleAddDeposit = function(event) {
+    window.handleAddEmployee = function(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        // Add your logic to save the deposit
-        console.log('Saving Deposit...', Object.fromEntries(formData.entries()));
-        // Example: addDepositToTable(Object.fromEntries(formData.entries()));
-        closeAddDepositDialog();
+        // Add your logic to save the employee
+        console.log('Saving Employee...', Object.fromEntries(formData.entries()));
+        // Example: addEmployeeToTable(Object.fromEntries(formData.entries()));
+        closeAddEmployeeDialog();
     };
 
-    // Example function to add row to table (requires ID from backend)
-    /*
-    function addDepositToTable(formData) {
-        const tbody = document.getElementById('depositTableBody');
-        const tr = document.createElement('tr');
-        // Assuming formData contains id after saving
-        tr.innerHTML = `
-            <td>${formData.id}</td>
-            <td>${formData['account-id']}</td>
-            <td>${formData.amount}</td>
-            <td>${formData['deposit-date']}</td>
-            <td>
-                <button class="btn-icon" onclick="editDeposit('${formData.id}')">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-icon" onclick="deleteDeposit('${formData.id}')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.insertBefore(tr, tbody.firstChild);
-    }
-    */
-
-    // Set up click-outside handler when the dialog is available
-    function setupDialogHandlers() {
-        const dialog = document.getElementById('addDepositDialog');
+    // Set up click-outside handler for the dialog
+    function setupEmployeeDialogHandlers() {
+        const dialog = document.getElementById('addEmployeeDialog');
         if (dialog) {
+            console.log('Setting up click-outside handler for employee dialog.');
             dialog.addEventListener('click', function(e) {
                 if (e.target === this) {
-                    closeAddDepositDialog();
+                    closeAddEmployeeDialog();
                 }
             });
         }
     }
 
-    // Try to set up handlers immediately
-    setupDialogHandlers();
+    // Call setup function when the script loads
+    console.log('Executing employees.html script.');
+    setupEmployeeDialogHandlers();
 
-    // Also set up handlers when DOM is ready (in case script loads before content)
-    document.addEventListener('DOMContentLoaded', setupDialogHandlers);
+    // Also call setup function when DOM is ready, in case script loads before content
+    document.addEventListener('DOMContentLoaded', setupEmployeeDialogHandlers);
 })();
 </script>
 
@@ -159,9 +146,8 @@
     font-size: 14px;
 }
 
-.form-group input[type="number"],
-.form-group input[type="date"],
-.form-group select {
+.form-group input[type="text"],
+.form-group input[type="date"] {
     width: 100%;
     padding: 8px 12px;
     border: 1px solid #D1D5DB;
@@ -170,9 +156,8 @@
     transition: border-color 0.2s;
 }
 
-.form-group input[type="number"]:focus,
-.form-group input[type="date"]:focus,
-.form-group select:focus {
+.form-group input[type="text"]:focus,
+.form-group input[type="date"]:focus {
     outline: none;
     border-color: #3B82F6;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);

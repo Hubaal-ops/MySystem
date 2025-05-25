@@ -49,7 +49,7 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="submenu" id="sales">
-                <a href="#sales-list"><i class="fas fa-list"></i> Sales List</a>
+                <a href="#sales"><i class="fas fa-list"></i> Sales List</a>
                 <a href="#sales-return"><i class="fas fa-undo"></i> Sales Return</a>
                 <a href="#payment-in"><i class="fas fa-money-bill"></i> Payment In</a>
                 <a href="#sales-estimate"><i class="fas fa-file-invoice"></i> Estimation</a>
@@ -80,7 +80,7 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="submenu" id="expenses">
-                <a href="#expense"><i class="fas fa-tags"></i> Expense category</a>
+                <a href="#expense-category"><i class="fas fa-tags"></i> Expense category</a>
                 <a href="#expense"><i class="fas fa-file-invoice"></i> Expense</a>
             </div>
 
@@ -283,23 +283,8 @@
                 // Insert the content without scripts
                 document.getElementById('mainContent').innerHTML = tempDiv.innerHTML;
                 
-                // Execute each script in sequence
-                for (const script of scriptsArray) {
-                    const newScript = document.createElement('script');
-                    if (script.src) {
-                        // For external scripts, load them asynchronously
-                        await new Promise((resolve, reject) => {
-                            newScript.src = script.src;
-                            newScript.onload = resolve;
-                            newScript.onerror = reject;
-                            document.body.appendChild(newScript);
-                        });
-                    } else {
-                        // For inline scripts, execute them immediately
-                        newScript.textContent = script.textContent;
-                        document.body.appendChild(newScript);
-                    }
-                }
+                // Handle and execute scripts, ensuring they run after content is added to DOM
+                await executeScripts(scriptsArray, document.getElementById('mainContent'));
 
                 // Initialize any dialogs after content is loaded
                 initializeDialogs();
@@ -307,6 +292,35 @@
             } catch (error) {
                 console.error('Error loading content:', error);
                 document.getElementById('mainContent').innerHTML = '<div class="error">Error loading content</div>';
+            }
+        }
+
+        // Handle and execute scripts, ensuring they run after content is added to DOM
+        async function executeScripts(scripts, container) {
+            for (const script of scripts) {
+                const newScript = document.createElement('script');
+                if (script.src) {
+                    newScript.src = script.src;
+                    newScript.async = false; // Execute scripts in order
+                    await new Promise(resolve => {
+                        newScript.onload = resolve;
+                        newScript.onerror = resolve; // Continue even if a script fails to load
+                        document.body.appendChild(newScript);
+                    });
+                } else {
+                    newScript.textContent = script.textContent;
+                    document.body.appendChild(newScript);
+                }
+            }
+            // After all scripts are potentially loaded/executed, initialize dialogs
+            // This calls any global initialization functions like setupDialogHandlers()
+            if (typeof window.setupEmployeeDialogHandlers === 'function') {
+                console.log('Calling setupEmployeeDialogHandlers after script execution.');
+                window.setupEmployeeDialogHandlers();
+            }
+            if (typeof window.setupDialogHandlers === 'function') {
+                console.log('Calling generic setupDialogHandlers after script execution.');
+                window.setupDialogHandlers();
             }
         }
 
@@ -619,73 +633,6 @@
                 };
                 bankTransferDialog.addEventListener('click', function(e) {
                     if (e.target === this) closeTransferDialog();
-                });
-            }
-
-            // Employee dialog
-            const employeeDialog = document.getElementById('addEmployeeDialog');
-            const importDialog = document.getElementById('importDialog');
-            
-            if (employeeDialog) {
-                window.openAddEmployeeDialog = function() {
-                    document.getElementById('addEmployeeForm').reset();
-                    document.getElementById('joinDate').valueAsDate = new Date();
-                    employeeDialog.classList.add('active');
-                };
-                
-                window.closeAddEmployeeDialog = function() {
-                    employeeDialog.classList.remove('active');
-                    document.getElementById('addEmployeeForm').reset();
-                };
-                
-                window.handleAddEmployee = function(event) {
-                    event.preventDefault();
-                    const formData = new FormData(event.target);
-                    // Add your logic to save the employee
-                    closeAddEmployeeDialog();
-                };
-                
-                window.editEmployee = function(employeeId) {
-                    // Populate form with employee data
-                    document.getElementById('addEmployeeForm').reset();
-                    employeeDialog.classList.add('active');
-                };
-                
-                window.viewEmployee = function(employeeId) {
-                    // Add view logic
-                    console.log('Viewing employee:', employeeId);
-                };
-                
-                window.toggleEmployeeStatus = function(employeeId) {
-                    // Add status toggle logic
-                    console.log('Toggling status for employee:', employeeId);
-                };
-                
-                employeeDialog.addEventListener('click', function(e) {
-                    if (e.target === this) closeAddEmployeeDialog();
-                });
-            }
-            
-            if (importDialog) {
-                window.openImportDialog = function() {
-                    document.getElementById('importForm').reset();
-                    importDialog.classList.add('active');
-                };
-                
-                window.closeImportDialog = function() {
-                    importDialog.classList.remove('active');
-                    document.getElementById('importForm').reset();
-                };
-                
-                window.handleImport = function(event) {
-                    event.preventDefault();
-                    const formData = new FormData(event.target);
-                    // Add your import logic here
-                    closeImportDialog();
-                };
-                
-                importDialog.addEventListener('click', function(e) {
-                    if (e.target === this) closeImportDialog();
                 });
             }
 

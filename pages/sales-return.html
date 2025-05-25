@@ -1,9 +1,12 @@
 <div class="product-container">
     <div class="page-header">
-        <h1>Sales Returns</h1>
+        <h1>Sales Return</h1>
         <div class="header-actions">
-            <button class="btn-primary" onclick="openAddReturnDialog()">
-                <i class="fas fa-plus"></i> New Return
+            <button class="btn-primary" onclick="openAddSalesReturnDialog()">
+                <i class="fas fa-plus"></i> Add Sales Return
+            </button>
+            <button class="btn-success">
+                <i class="fas fa-file-import"></i> Import Sales Return
             </button>
         </div>
     </div>
@@ -12,176 +15,85 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Return No</th>
-                    <th>Invoice No</th>
-                    <th>Customer</th>
-                    <th>Total Amount</th>
-                    <th>Status</th>
+                    <th>Sales-Return ID</th>
+                    <th>Sale Name</th>
+                    <th>Customer Name</th>
+                    <th>Store Name</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Amount</th>
+                    <th>Paid/Refunded</th>
+                    <th>Reason</th>
+                    <th>Created</th>
+                    <th>Updated</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>2024-03-16</td>
-                    <td>RET-001</td>
-                    <td>INV-001</td>
-                    <td>John Doe</td>
-                    <td>$500.00</td>
-                    <td><span class="badge paid">Completed</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-action view" title="View">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn-action edit" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-action delete" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2024-03-15</td>
-                    <td>RET-002</td>
-                    <td>INV-003</td>
-                    <td>Jane Smith</td>
-                    <td>$750.00</td>
-                    <td><span class="badge partial">Pending</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-action view" title="View">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn-action edit" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-action delete" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
+
         </table>
     </div>
 
-    <!-- Add Return Dialog -->
-    <div class="dialog-overlay" id="addReturnDialog">
+    <!-- Add Sales Return Dialog -->
+    <div class="dialog-overlay" id="addSalesReturnDialog">
         <div class="dialog dialog-lg">
             <div class="dialog-header">
                 <h2>New Sales Return</h2>
-                <button class="close-btn" onclick="closeAddReturnDialog()">
+                <button class="close-btn" onclick="closeAddSalesReturnDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
-                <form id="addReturnForm" onsubmit="handleAddReturn(event)">
-                    <div class="form-row">
+                <form id="addSalesReturnForm" onsubmit="handleAddSalesReturn(event)">
+                    <div class="form-grid">
                         <div class="form-group">
-                            <label for="invoice">Select Invoice</label>
-                            <select id="invoice" required onchange="loadInvoiceDetails(this.value)">
-                                <option value="">Select Invoice</option>
-                                <option value="1">INV-001 (John Doe)</option>
-                                <option value="2">INV-002 (Jane Smith)</option>
+                            <label for="sale-id">Original Sale</label>
+                            <select name="sale-id" id="sale-id" required>
+                                <option value="">Select Original Sale</option>
+                                <option value="sale1">Sale ID 123</option>
+                                <option value="sale2">Sale ID 456</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="returnDate">Return Date</label>
-                            <input type="date" id="returnDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="returnNo">Return No</label>
-                            <input type="text" id="returnNo" readonly>
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Return Items</label>
-                        <div class="return-items">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Description</th>
-                                        <th>Sold Qty</th>
-                                        <th>Return Qty</th>
-                                        <th>Unit Price</th>
-                                        <th>Total</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="returnItemsBody">
-                                    <tr>
-                                        <td>
-                                            <select class="product-select" disabled>
-                                                <option value="">Select Product</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="item-description" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="sold-qty" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="return-qty" min="1" onchange="calculateItemTotal(this.closest('tr'))">
-                                        </td>
-                                        <td>
-                                            <input type="number" class="unit-price" step="0.01" readonly>
-                                        </td>
-                                        <td class="item-total">0.00</td>
-                                        <td>
-                                            <button type="button" class="btn-danger" onclick="removeReturnItem(this)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="5" class="text-right"><strong>Total Return Amount:</strong></td>
-                                        <td id="total">0.00</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
                         <div class="form-group">
-                            <label for="reason">Return Reason</label>
-                            <select id="reason" required>
-                                <option value="">Select Reason</option>
-                                <option value="damaged">Damaged Product</option>
-                                <option value="wrong">Wrong Product</option>
-                                <option value="not_satisfied">Customer Not Satisfied</option>
-                                <option value="other">Other</option>
+                            <label for="product-name">Product Name</label>
+                            <select name="product-name" id="product-name" required>
+                                <option value="">Select Product to Return</option>
+                                <option value="product1">Product A</option>
+                                <option value="product2">Product B</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="refundMethod">Refund Method</label>
-                            <select id="refundMethod" required>
-                                <option value="">Select Refund Method</option>
-                                <option value="cash">Cash</option>
-                                <option value="card">Card</option>
-                                <option value="bank">Bank Transfer</option>
-                                <option value="store_credit">Store Credit</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" rows="3"></textarea>
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" id="quantity" name="quantity" min="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">Price</label>
+                            <input type="number" id="price" name="price" min="0" step="0.01" required>
+                        </div>
+
+                         <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <input type="number" id="amount" name="amount" readonly>
+                        </div>
+
+                         <div class="form-group">
+                            <label for="refunded-amount">Refunded Amount</label>
+                            <input type="number" id="refunded-amount" name="refunded-amount" min="0" step="0.01" required>
+                        </div>
+
+                         <div class="form-group">
+                            <label for="reason">Reason for Return</label>
+                            <textarea id="reason" name="reason" rows="3"></textarea>
+                        </div>
+
                     </div>
 
                     <div class="dialog-actions">
-                        <button type="button" class="btn-secondary" onclick="closeAddReturnDialog()">Cancel</button>
-                        <button type="submit" class="btn-primary">Create Return</button>
+                        <button type="button" class="btn-secondary" onclick="closeAddSalesReturnDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Sales Return</button>
                     </div>
                 </form>
             </div>
@@ -190,214 +102,275 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dialog = document.getElementById('addReturnDialog');
-    
-    window.openAddReturnDialog = function() {
-        dialog.classList.add('active');
-        document.getElementById('returnDate').valueAsDate = new Date();
-        generateReturnNo();
-    };
-
-    window.closeAddReturnDialog = function() {
-        dialog.classList.remove('active');
-        document.getElementById('addReturnForm').reset();
-        document.getElementById('returnItemsBody').innerHTML = '';
-        addEmptyReturnRow();
-    };
-
-    window.generateReturnNo = function() {
-        const date = new Date();
-        const year = date.getFullYear().toString().substr(-2);
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        document.getElementById('returnNo').value = `RET${year}${month}${random}`;
-    };
-
-    window.loadInvoiceDetails = function(invoiceId) {
-        // In a real application, you would fetch invoice details from the server
-        const tbody = document.getElementById('returnItemsBody');
-        tbody.innerHTML = '';
-
-        if (invoiceId === '1') {
-            addReturnItem({
-                product: 'Product 1',
-                description: 'Product 1 Description',
-                soldQty: 5,
-                unitPrice: 100.00
-            });
-            addReturnItem({
-                product: 'Product 2',
-                description: 'Product 2 Description',
-                soldQty: 3,
-                unitPrice: 200.00
-            });
-        } else if (invoiceId === '2') {
-            addReturnItem({
-                product: 'Product 3',
-                description: 'Product 3 Description',
-                soldQty: 2,
-                unitPrice: 150.00
-            });
+// Initialize sales return dialog functionality
+(function() {
+    // Make functions globally available immediately
+    window.openAddSalesReturnDialog = function() {
+        console.log('Opening sales return dialog...');
+        const dialog = document.getElementById('addSalesReturnDialog');
+        if (dialog) {
+            dialog.classList.add('active');
+        } else {
+            console.error('Sales Return dialog element not found!');
         }
     };
 
-    window.addReturnItem = function(item) {
-        const tbody = document.getElementById('returnItemsBody');
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>
-                <select class="product-select" disabled>
-                    <option value="">${item.product}</option>
-                </select>
-            </td>
-            <td>
-                <input type="text" class="item-description" value="${item.description}" readonly>
-            </td>
-            <td>
-                <input type="number" class="sold-qty" value="${item.soldQty}" readonly>
-            </td>
-            <td>
-                <input type="number" class="return-qty" min="1" max="${item.soldQty}" onchange="calculateItemTotal(this.closest('tr'))">
-            </td>
-            <td>
-                <input type="number" class="unit-price" value="${item.unitPrice.toFixed(2)}" step="0.01" readonly>
-            </td>
-            <td class="item-total">0.00</td>
-            <td>
-                <button type="button" class="btn-danger" onclick="removeReturnItem(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    };
-
-    window.addEmptyReturnRow = function() {
-        const tbody = document.getElementById('returnItemsBody');
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>
-                <select class="product-select" disabled>
-                    <option value="">Select Product</option>
-                </select>
-            </td>
-            <td>
-                <input type="text" class="item-description" readonly>
-            </td>
-            <td>
-                <input type="number" class="sold-qty" readonly>
-            </td>
-            <td>
-                <input type="number" class="return-qty" min="1" onchange="calculateItemTotal(this.closest('tr'))">
-            </td>
-            <td>
-                <input type="number" class="unit-price" step="0.01" readonly>
-            </td>
-            <td class="item-total">0.00</td>
-            <td>
-                <button type="button" class="btn-danger" onclick="removeReturnItem(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    };
-
-    window.removeReturnItem = function(button) {
-        const tbody = document.getElementById('returnItemsBody');
-        if (tbody.children.length > 1) {
-            button.closest('tr').remove();
+    window.closeAddSalesReturnDialog = function() {
+        console.log('Closing sales return dialog...');
+        const dialog = document.getElementById('addSalesReturnDialog');
+        if (dialog) {
+            dialog.classList.remove('active');
+            const form = document.getElementById('addSalesReturnForm');
+            if (form) form.reset();
         }
-        calculateTotals();
     };
 
-    window.calculateItemTotal = function(row) {
-        const returnQty = parseInt(row.querySelector('.return-qty').value) || 0;
-        const soldQty = parseInt(row.querySelector('.sold-qty').value) || 0;
-        const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
-        
-        // Ensure return quantity doesn't exceed sold quantity
-        if (returnQty > soldQty) {
-            row.querySelector('.return-qty').value = soldQty;
-            return calculateItemTotal(row);
-        }
-        
-        const total = returnQty * unitPrice;
-        row.querySelector('.item-total').textContent = total.toFixed(2);
-        
-        calculateTotals();
-    };
-
-    window.calculateTotals = function() {
-        const itemTotals = Array.from(document.querySelectorAll('.item-total'))
-            .map(td => parseFloat(td.textContent) || 0);
-        
-        const total = itemTotals.reduce((sum, total) => sum + total, 0);
-        document.getElementById('total').textContent = total.toFixed(2);
-    };
-
-    window.handleAddReturn = function(event) {
+    window.handleAddSalesReturn = function(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        // Add your logic to save the return
-        closeAddReturnDialog();
+        // Add your logic to save the sales return
+        console.log('Saving Sales Return...', Object.fromEntries(formData.entries()));
+        closeAddSalesReturnDialog();
     };
 
-    // Close dialog when clicking outside
-    dialog.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeAddReturnDialog();
+    // Set up click-outside handler when the dialog is available
+    function setupDialogHandlers() {
+        const dialog = document.getElementById('addSalesReturnDialog');
+        if (dialog) {
+            dialog.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAddSalesReturnDialog();
+                }
+            });
         }
-    });
+    }
 
-    // Initialize with one empty row
-    addEmptyReturnRow();
+    // Try to set up handlers immediately
+    setupDialogHandlers();
+
+    // Also set up handlers when DOM is ready (in case script loads before content)
+    document.addEventListener('DOMContentLoaded', setupDialogHandlers);
+})();
+
+// Add this script to calculate amount automatically based on quantity and price
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('addSalesReturnForm');
+    if (form) {
+        const calculateAmount = () => {
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const price = parseFloat(document.getElementById('price').value) || 0;
+
+            const total = quantity * price;
+
+            document.getElementById('amount').value = total.toFixed(2);
+        };
+
+        // Add event listeners for calculation
+        ['quantity', 'price'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', calculateAmount);
+            }
+        });
+
+         // Initial calculation in case of pre-filled values
+        calculateAmount();
+    }
 });
 </script>
 
 <style>
-.return-items {
-    margin-top: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 15px;
+.product-container {
+    padding: 20px;
 }
 
 .dialog-lg {
     max-width: 1000px;
 }
 
-.product-select {
-    width: 200px;
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 20px; /* Gap between grid items */
+    margin-bottom: 20px;
 }
 
-.item-description {
-    width: 200px;
+.form-group {
+    margin-bottom: 0; /* Remove default margin, use grid gap */
 }
 
-.sold-qty,
-.return-qty,
-.unit-price {
-    width: 100px;
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-weight: 500;
+    font-size: 14px;
 }
 
-.text-right {
-    text-align: right;
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
 }
 
-.item-total {
-    text-align: right;
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
-.btn-danger {
-    color: #dc2626;
+.form-group input[readonly] {
+    background-color: #F3F4F6;
+    cursor: not-allowed;
+}
+
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #2563EB;
+}
+
+.btn-secondary {
+    background-color: #F3F4F6;
+    color: #374151;
+    border: 1px solid #D1D5DB;
+}
+
+.btn-secondary:hover {
+    background-color: #E5E7EB;
+}
+
+.dialog-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dialog-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #111827;
+}
+
+.close-btn {
     background: none;
     border: none;
+    color: #6B7280;
     cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
 }
 
-.btn-danger:hover {
-    color: #991b1b;
+.close-btn:hover {
+    background-color: #F3F4F6;
+    color: #374151;
 }
+
+.dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.dialog-overlay.active {
+    display: flex;
+}
+
+.dialog {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+}
+
+.dialog-content {
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto; /* Add scrolling for long forms */
+}
+
+/* Styles for the table */
+.table-container {
+    overflow-x: auto; /* Add horizontal scrolling if table overflows */
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    /* table-layout: fixed; */ /* Use auto layout */
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #E5E7EB;
+    white-space: nowrap; /* Prevent text wrapping in cells */
+}
+
+.data-table th {
+    background-color: #F9FAFB;
+    color: #374151;
+    font-weight: normal; /* Set font-weight to normal */
+    text-transform: none; /* Remove uppercase */
+    font-size: 12px; /* Slightly reduce font size for headers */
+}
+
+.data-table td {
+    color: #4B5563;
+    font-size: 14px;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: #F3F4F6;
+}
+
+/* Note: Adjust column widths as needed */
 </style> 

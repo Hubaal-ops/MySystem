@@ -1,12 +1,12 @@
 <div class="product-container">
     <div class="page-header">
-        <h1>Purchases</h1>
+        <h1>Sales</h1>
         <div class="header-actions">
-            <button class="btn-primary" onclick="openAddPurchaseDialog()">
-                <i class="fas fa-plus"></i> Add Product
+            <button class="btn-primary" onclick="openAddSaleDialog()">
+                <i class="fas fa-plus"></i> Add Sale
             </button>
             <button class="btn-success">
-                <i class="fas fa-file-import"></i> Import Product
+                <i class="fas fa-file-import"></i> Import Sale
             </button>
         </div>
     </div>
@@ -15,54 +15,38 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Purchase-Return ID</th>
-                    <th>Purchase Name</th>
-                    <th>Supplier Name</th>
-                   <th>Store Name</th>
+                    <th>Sales ID</th>
                     <th>Product Name</th>
+                    <th>Store Name</th>
+                    <th>Customer Name</th>
                     <th>Quantity</th>
                     <th>Price</th>
-                     <th>Amount</th>
+                    <th>Discount</th>
+                    <th>Tax</th>
+                    <th>Amount</th>
                     <th>Paid</th>
-                    <th>Reason</th>
+                    <th>Account Name</th>
                     <th>Created</th>
                     <th>Updated</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            
+
         </table>
     </div>
 
-    <!-- Add Product Dialog -->
-    <div class="dialog-overlay" id="addPurchaseDialog">
+    <!-- Add Sale Dialog -->
+    <div class="dialog-overlay" id="addSaleDialog">
         <div class="dialog dialog-lg">
             <div class="dialog-header">
-                <h2>New Purchase</h2>
-                <button class="close-btn" onclick="closeAddPurchaseDialog()">
+                <h2>New Sale</h2>
+                <button class="close-btn" onclick="closeAddSaleDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
-                <form id="addPurchaseForm" onsubmit="handleAddPurchase(event)">
-
+                <form id="addSaleForm" onsubmit="handleAddSale(event)">
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label for="purchase-name">Purchase Name</label>
-                            <select name="purchase-name" id="supplier-name" required>
-                                <option value="">Select Purchase</option>
-                                <option value="purchase">purchase 1</option>
-                                <option value="supplier2">purchase 2</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="supplier-name">Supplier Name</label>
-                            <select name="supplier-name" id="supplier-name" required>
-                                <option value="">Select Supplier</option>
-                                <option value="supplier1">Supplier 1</option>
-                                <option value="supplier2">Supplier 2</option>
-                            </select>
-                        </div>
                         <div class="form-group">
                             <label for="product-name">Product Name</label>
                             <select name="product-name" id="product-name" required>
@@ -82,6 +66,24 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="customer-name">Customer Name</label>
+                            <select name="customer-name" id="customer-name" required>
+                                <option value="">Select Customer</option>
+                                <option value="customer1">Customer 1</option>
+                                <option value="customer2">Customer 2</option>
+                            </select>
+                        </div>
+
+                         <div class="form-group">
+                            <label for="account-name">Account Name</label>
+                            <select name="account-name" id="account-name" required>
+                                <option value="">Select Account</option>
+                                <option value="account1">Account 1</option>
+                                <option value="account2">Account 2</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="quantity">Quantity</label>
                             <input type="number" id="quantity" name="quantity" min="1" required>
                         </div>
@@ -91,8 +93,16 @@
                             <input type="number" id="price" name="price" min="0" step="0.01" required>
                         </div>
 
-                        
-                        
+                        <div class="form-group">
+                            <label for="discount">Discount</label>
+                            <input type="number" id="discount" name="discount" min="0" step="0.01" value="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tax">Tax</label>
+                            <input type="number" id="tax" name="tax" min="0" step="0.01" value="0">
+                        </div>
+
                         <div class="form-group">
                             <label for="amount">Amount</label>
                             <input type="number" id="amount" name="amount" readonly>
@@ -102,15 +112,12 @@
                             <label for="paid">Paid Amount</label>
                             <input type="number" id="paid" name="paid" min="0" step="0.01" required>
                         </div>
-                         <div class="form-group">
-                            <label for="reason">Reason</label>
-                            <input type="number" id="reason" name="reason" min="0" step="0.01" required>
-                        </div>
+
                     </div>
 
                     <div class="dialog-actions">
-                        <button type="button" class="btn-secondary" onclick="closeAddPurchaseDialog()">Cancel</button>
-                        <button type="submit" class="btn-primary">Save Purchase</button>
+                        <button type="button" class="btn-secondary" onclick="closeAddSaleDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Sale</button>
                     </div>
                 </form>
             </div>
@@ -119,43 +126,44 @@
 </div>
 
 <script>
-// Initialize purchase dialog functionality
+// Initialize sales dialog functionality
 (function() {
     // Make functions globally available immediately
-    window.openAddPurchaseDialog = function() {
-        console.log('Opening purchase dialog...');
-        const dialog = document.getElementById('addPurchaseDialog');
+    window.openAddSaleDialog = function() {
+        console.log('Opening sales dialog...');
+        const dialog = document.getElementById('addSaleDialog');
         if (dialog) {
             dialog.classList.add('active');
         } else {
-            console.error('Purchase dialog element not found!');
+            console.error('Sales dialog element not found!');
         }
     };
 
-    window.closeAddPurchaseDialog = function() {
-        console.log('Closing purchase dialog...');
-        const dialog = document.getElementById('addPurchaseDialog');
+    window.closeAddSaleDialog = function() {
+        console.log('Closing sales dialog...');
+        const dialog = document.getElementById('addSaleDialog');
         if (dialog) {
             dialog.classList.remove('active');
-            const form = document.getElementById('addPurchaseForm');
+            const form = document.getElementById('addSaleForm');
             if (form) form.reset();
         }
     };
 
-    window.handleAddPurchase = function(event) {
+    window.handleAddSale = function(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        // Add your logic to save the product
-        closeAddPurchaseDialog();
+        // Add your logic to save the sale
+        console.log('Saving Sale...', Object.fromEntries(formData.entries()));
+        closeAddSaleDialog();
     };
 
     // Set up click-outside handler when the dialog is available
     function setupDialogHandlers() {
-        const dialog = document.getElementById('addPurchaseDialog');
+        const dialog = document.getElementById('addSaleDialog');
         if (dialog) {
             dialog.addEventListener('click', function(e) {
                 if (e.target === this) {
-                    closeAddPurchaseDialog();
+                    closeAddSaleDialog();
                 }
             });
         }
@@ -168,21 +176,22 @@
     document.addEventListener('DOMContentLoaded', setupDialogHandlers);
 })();
 
-// Add this to your existing script to calculate amount automatically
+// Add this script to calculate amount automatically
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('addPurchaseForm');
+    const form = document.getElementById('addSaleForm');
     if (form) {
         const calculateAmount = () => {
             const quantity = parseFloat(document.getElementById('quantity').value) || 0;
             const price = parseFloat(document.getElementById('price').value) || 0;
             const discount = parseFloat(document.getElementById('discount').value) || 0;
             const tax = parseFloat(document.getElementById('tax').value) || 0;
-            
-            const subtotal = quantity * price;
+
+            let subtotal = quantity * price;
             const discountAmount = (subtotal * discount) / 100;
-            const taxAmount = ((subtotal - discountAmount) * tax) / 100;
-            const total = subtotal - discountAmount + taxAmount;
-            
+            subtotal -= discountAmount; // Apply discount before tax
+            const taxAmount = (subtotal * tax) / 100;
+            const total = subtotal + taxAmount; // Add tax after discount
+
             document.getElementById('amount').value = total.toFixed(2);
         };
 
@@ -193,6 +202,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 element.addEventListener('input', calculateAmount);
             }
         });
+
+         // Initial calculation in case of pre-filled values
+        calculateAmount();
     }
 });
 </script>
@@ -208,13 +220,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 20px; /* Gap between grid items */
     margin-bottom: 20px;
 }
 
 .form-group {
-    margin-bottom: 0; /* Remove bottom margin since we're using grid gap */
+    margin-bottom: 0; /* Remove default margin, use grid gap */
 }
 
 .form-group label {
@@ -227,7 +239,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .form-group input[type="text"],
 .form-group input[type="number"],
-.form-group select {
+.form-group select,
+.form-group textarea {
     width: 100%;
     padding: 8px 12px;
     border: 1px solid #D1D5DB;
@@ -238,7 +251,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .form-group input[type="text"]:focus,
 .form-group input[type="number"]:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
     outline: none;
     border-color: #3B82F6;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
@@ -248,6 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
     background-color: #F3F4F6;
     cursor: not-allowed;
 }
+
 
 .dialog-actions {
     display: flex;
@@ -346,11 +361,11 @@ document.addEventListener('DOMContentLoaded', function() {
 .dialog-content {
     padding: 20px;
     max-height: 80vh;
-    overflow-y: auto;
+    overflow-y: auto; /* Add scrolling for long forms */
 }
 
 .table-container {
-    overflow-x: auto; /* Add horizontal scrolling if table overflows */
+    overflow-x: auto; /* Keep horizontal scrolling for safety, though we aim to avoid it */
     margin-top: 20px;
     background: #fff;
     border-radius: 8px;
@@ -358,9 +373,9 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .data-table {
-    width: 100%;
+    width: 100%; /* Table takes full width of container */
     border-collapse: collapse;
-    /* table-layout: fixed; */ /* Use auto layout */
+    /* Remove table-layout: fixed; */
 }
 
 .data-table th,
@@ -374,9 +389,10 @@ document.addEventListener('DOMContentLoaded', function() {
 .data-table th {
     background-color: #F9FAFB;
     color: #374151;
-    font-weight: normal; /* Set font-weight to normal */
-    text-transform: none; /* Remove uppercase */
-    font-size: 12px; /* Slightly reduce font size for headers */
+    font-weight: normal;
+    text-transform: none;
+    font-size: 12px; /* Keep font size at 12px for balance */
+    white-space: nowrap; /* Prevent text from wrapping */
 }
 
 .data-table td {
@@ -392,19 +408,21 @@ document.addEventListener('DOMContentLoaded', function() {
     background-color: #F3F4F6;
 }
 
-/* Remove fixed column widths */
-/* .data-table th:nth-child(1) { width: 10%; } */
-/* .data-table th:nth-child(2) { width: 15%; } */
-/* .data-table th:nth-child(3) { width: 10%; } */
-/* .data-table th:nth-child(4) { width: 10%; } */
-/* .data-table th:nth-child(5) { width: 8%; } */
-/* .data-table th:nth-child(6) { width: 8%; } */
-/* .data-table th:nth-child(7) { width: 8%; } */
-/* .data-table th:nth-child(8) { width: 8%; } */
-/* .data-table th:nth-child(9) { width: 8%; } */
-/* .data-table th:nth-child(10) { width: 8%; } */
-/* .data-table th:nth-child(11) { width: 10%; } */
-/* .data-table th:nth-child(12) { width: 10%; } */
-/* .data-table th:nth-child(13) { width: 10%; } */
-/* .data-table th:nth-child(14) { width: 8%; } */
+/* Adjust column widths to fit within 100% */
+/* Note: These widths are a starting point and might need adjustment */
+.data-table th:nth-child(1) { width: 6%; }  /* Sales ID */
+.data-table th:nth-child(2) { width: 12%; } /* Product Name */
+.data-table th:nth-child(3) { width: 7%; }  /* Store Name */
+.data-table th:nth-child(4) { width: 10%; } /* Customer Name */
+.data-table th:nth-child(5) { width: 5%; }  /* Quantity */
+.data-table th:nth-child(6) { width: 6%; }  /* Price */
+.data-table th:nth-child(7) { width: 6%; }  /* Discount */
+.data-table th:nth-child(8) { width: 5%; }  /* Tax */
+.data-table th:nth-child(9) { width: 7%; }  /* Amount */
+.data-table th:nth-child(10) { width: 7%; } /* Paid */
+.data-table th:nth-child(11) { width: 8%; }  /* Account Name */
+.data-table th:nth-child(12) { width: 8%; } /* Created */
+.data-table th:nth-child(13) { width: 8%; } /* Updated */
+.data-table th:nth-child(14) { width: 8%; }  /* Action */
+
 </style> 

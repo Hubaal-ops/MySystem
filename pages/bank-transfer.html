@@ -1,9 +1,9 @@
-<div class="bank-transfer-container">
+<div class="container">
     <div class="page-header">
         <h1>Bank Transfers</h1>
         <div class="header-actions">
             <button class="btn-primary" onclick="openAddTransferDialog()">
-                <i class="fas fa-exchange-alt"></i> New Transfer
+                <i class="fas fa-plus"></i> Add Transfer
             </button>
         </div>
     </div>
@@ -12,99 +12,59 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Reference</th>
-                    <th>Date</th>
-                    <th>From Account</th>
-                    <th>To Account</th>
+                    <th>ID</th>
+                    <th>From Account ID</th>
+                    <th>To Account ID</th>
                     <th>Amount</th>
-                    <th>Status</th>
+                    <th>Transfer Date</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody id="transferTableBody">
-                <tr>
-                    <td>TRF-2024-001</td>
-                    <td>2024-02-25</td>
-                    <td>Main Operating Account</td>
-                    <td>Savings Account</td>
-                    <td>$10,000.00</td>
-                    <td><span class="badge badge-success">Completed</span></td>
-                    <td>
-                        <button class="btn-link" onclick="viewTransferDetails('1')">View</button>
-                    </td>
-                </tr>
+                <!-- Transfer rows will be added dynamically -->
             </tbody>
         </table>
     </div>
 
-    <!-- Add/Edit Transfer Dialog -->
-    <div class="dialog-overlay" id="transferDialog">
-        <div class="dialog dialog-lg">
+    <!-- Add Transfer Dialog -->
+    <div class="dialog-overlay" id="addTransferDialog">
+        <div class="dialog">
             <div class="dialog-header">
-                <h2 id="dialogTitle">New Bank Transfer</h2>
-                <button class="close-btn" onclick="closeTransferDialog()">
+                <h2>New Bank Transfer</h2>
+                <button class="close-btn" onclick="closeAddTransferDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
-                <form id="transferForm" onsubmit="handleTransferSubmit(event)">
-                    <input type="hidden" id="transferAction" value="add">
-                    
-                    <!-- Basic Information -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="reference">Reference</label>
-                            <input type="text" id="reference" readonly>
-                            <small class="text-muted">Auto-generated</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="transferDate">Date</label>
-                            <input type="date" id="transferDate" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="fromAccount">From Account</label>
-                            <select id="fromAccount" required onchange="updateToAccounts()">
-                                <option value="">Select Account</option>
-                                <option value="1">Main Operating Account</option>
-                                <option value="2">Savings Account</option>
-                            </select>
-                            <small id="fromBalance" class="text-muted">Available Balance: $0.00</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="toAccount">To Account</label>
-                            <select id="toAccount" required>
-                                <option value="">Select Account</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="amount">Amount</label>
-                            <input type="number" id="amount" required step="0.01" min="0.01" onchange="validateAmount()">
-                        </div>
-                        <div class="form-group">
-                            <label for="transferFee">Transfer Fee</label>
-                            <input type="number" id="transferFee" value="0" step="0.01" min="0">
-                        </div>
+                <form id="addTransferForm" onsubmit="handleAddTransfer(event)">
+                    <div class="form-group">
+                        <label for="from-account-id">From Account</label>
+                        <select id="from-account-id" name="from-account-id" required>
+                            <option value="">Select Account</option>
+                            <!-- Account options will be loaded dynamically -->
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" rows="3"></textarea>
+                        <label for="to-account-id">To Account</label>
+                        <select id="to-account-id" name="to-account-id" required>
+                            <option value="">Select Account</option>
+                            <!-- Account options will be loaded dynamically -->
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="attachment">Attachment</label>
-                        <input type="file" id="attachment" accept=".pdf,.jpg,.jpeg,.png">
-                        <small class="text-muted">Upload supporting document if any (PDF, JPG, PNG)</small>
+                        <label for="amount">Amount</label>
+                        <input type="number" id="amount" name="amount" min="0" step="0.01" required>
+                    </div>
+
+                     <div class="form-group">
+                        <label for="transfer-date">Transfer Date</label>
+                        <input type="date" id="transfer-date" name="transfer-date" required>
                     </div>
 
                     <div class="dialog-actions">
-                        <button type="button" class="btn-secondary" onclick="closeTransferDialog()">Cancel</button>
+                        <button type="button" class="btn-secondary" onclick="closeAddTransferDialog()">Cancel</button>
                         <button type="submit" class="btn-primary">Save Transfer</button>
                     </div>
                 </form>
@@ -114,158 +74,263 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dialog = document.getElementById('transferDialog');
-    
+// Initialize transfer dialog functionality
+(function() {
+    // Make functions globally available immediately
     window.openAddTransferDialog = function() {
-        document.getElementById('dialogTitle').textContent = 'New Bank Transfer';
-        document.getElementById('transferAction').value = 'add';
-        document.getElementById('reference').value = generateTransferReference();
-        document.getElementById('transferDate').valueAsDate = new Date();
-        document.getElementById('transferForm').reset();
-        dialog.classList.add('active');
+        console.log('Opening transfer dialog...');
+        const dialog = document.getElementById('addTransferDialog');
+        if (dialog) {
+            dialog.classList.add('active');
+        } else {
+            console.error('Transfer dialog element not found!');
+        }
     };
 
-    window.closeTransferDialog = function() {
-        dialog.classList.remove('active');
-        document.getElementById('transferForm').reset();
+    window.closeAddTransferDialog = function() {
+        console.log('Closing transfer dialog...');
+        const dialog = document.getElementById('addTransferDialog');
+        if (dialog) {
+            dialog.classList.remove('active');
+            const form = document.getElementById('addTransferForm');
+            if (form) form.reset();
+        }
     };
 
-    window.handleTransferSubmit = function(event) {
+    window.handleAddTransfer = function(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
         // Add your logic to save the transfer
-        closeTransferDialog();
+        console.log('Saving Transfer...', Object.fromEntries(formData.entries()));
+        // Example: addTransferToTable(Object.fromEntries(formData.entries()));
+        closeAddTransferDialog();
     };
 
-    window.updateToAccounts = function() {
-        const fromAccount = document.getElementById('fromAccount').value;
-        const toAccount = document.getElementById('toAccount');
-        toAccount.innerHTML = '<option value="">Select Account</option>';
-        
-        // Get all accounts except the selected 'from' account
-        const accounts = {
-            '1': 'Main Operating Account',
-            '2': 'Savings Account'
-        };
-        
-        Object.entries(accounts).forEach(([id, name]) => {
-            if (id !== fromAccount) {
-                toAccount.add(new Option(name, id));
-            }
-        });
+    // Example function to add row to table (requires ID from backend)
+    /*
+    function addTransferToTable(formData) {
+        const tbody = document.getElementById('transferTableBody');
+        const tr = document.createElement('tr');
+        // Assuming formData contains id after saving
+        tr.innerHTML = `
+            <td>${formData.id}</td>
+            <td>${formData['from-account-id']}</td>
+            <td>${formData['to-account-id']}</td>
+            <td>${formData.amount}</td>
+            <td>${formData['transfer-date']}</td>
+            <td>
+                <button class="btn-icon" onclick="editTransfer('${formData.id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon" onclick="deleteTransfer('${formData.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.insertBefore(tr, tbody.firstChild);
+    }
+    */
 
-        // Update available balance (this would typically fetch from your database)
-        document.getElementById('fromBalance').textContent = 
-            `Available Balance: $${(Math.random() * 100000).toFixed(2)}`;
-    };
-
-    window.validateAmount = function() {
-        const amount = parseFloat(document.getElementById('amount').value) || 0;
-        const fee = parseFloat(document.getElementById('transferFee').value) || 0;
-        const balance = parseFloat(document.getElementById('fromBalance').textContent
-            .replace('Available Balance: $', '')) || 0;
-
-        if (amount + fee > balance) {
-            alert('Transfer amount exceeds available balance');
-            document.getElementById('amount').value = '';
+    // Set up click-outside handler when the dialog is available
+    function setupDialogHandlers() {
+        const dialog = document.getElementById('addTransferDialog');
+        if (dialog) {
+            dialog.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAddTransferDialog();
+                }
+            });
         }
-    };
+    }
 
-    window.generateTransferReference = function() {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        return `TRF-${year}${month}-${random}`;
-    };
+    // Try to set up handlers immediately
+    setupDialogHandlers();
 
-    // Close dialog when clicking outside
-    dialog.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeTransferDialog();
-        }
-    });
-});
+    // Also set up handlers when DOM is ready (in case script loads before content)
+    document.addEventListener('DOMContentLoaded', setupDialogHandlers);
+})();
 </script>
 
 <style>
-.bank-transfer-container {
+/* Reusing styles from previous pages */
+.container {
     padding: 20px;
 }
 
-.dialog-lg {
-    max-width: 800px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
+    margin-bottom: 8px;
     color: #374151;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #D1D5DB;
-    border-radius: 4px;
+    font-weight: 500;
     font-size: 14px;
 }
 
-.form-group input[type="file"] {
-    padding: 6px;
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
 }
 
-.text-muted {
+.form-group input[type="number"]:focus,
+.form-group input[type="date"]:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
     color: #6B7280;
-    font-size: 0.875rem;
-    display: block;
-    margin-top: 4px;
+    margin-right: 5px;
+}
+
+.btn-icon:hover {
+    color: #374151;
+}
+
+.btn-icon i {
+    font-size: 14px;
 }
 
 .dialog-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #E5E7EB;
 }
 
+.btn-primary,
 .btn-secondary {
-    background: #6B7280;
-    color: white;
-    border: none;
     padding: 8px 16px;
-    border-radius: 4px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #2563EB;
 }
 
 .btn-secondary:hover {
-    background: #4B5563;
+    background-color: #E5E7EB;
 }
 
-.badge {
-    padding: 4px 8px;
+.dialog-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dialog-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #111827;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #6B7280;
+    cursor: pointer;
+    padding: 4px;
     border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
+    transition: all 0.2s;
 }
 
-.badge-success {
-    background-color: #10B981;
-    color: white;
+.close-btn:hover {
+    background-color: #F3F4F6;
+    color: #374151;
+}
+
+.dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.dialog-overlay.active {
+    display: flex;
+}
+
+.dialog {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+}
+
+.dialog-content {
+    padding: 20px;
+}
+
+/* Styles for the table */
+.table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #E5E7EB;
+    white-space: nowrap;
+}
+
+.data-table th {
+    background-color: #F9FAFB;
+    color: #374151;
+    font-weight: normal;
+    text-transform: none;
+    font-size: 12px;
+}
+
+.data-table td {
+    color: #4B5563;
+    font-size: 14px;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: #F3F4F6;
 }
 </style> 

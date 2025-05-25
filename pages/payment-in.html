@@ -2,8 +2,11 @@
     <div class="page-header">
         <h1>Payment In</h1>
         <div class="header-actions">
-            <button class="btn-primary" onclick="openAddPaymentDialog()">
-                <i class="fas fa-plus"></i> New Payment
+            <button class="btn-primary" onclick="openAddPaymentInDialog()">
+                <i class="fas fa-plus"></i> Add Payment In
+            </button>
+            <button class="btn-success">
+                <i class="fas fa-file-import"></i> Import Payment In
             </button>
         </div>
     </div>
@@ -12,174 +15,65 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Payment No</th>
-                    <th>Customer</th>
-                    <th>Payment Method</th>
+                    <th>Payment-In ID</th>
+                    <th>Customer Name</th>
+                    <th>Account Name</th>
                     <th>Amount</th>
-                    <th>Reference</th>
+                    <th>Description</th>
+                    <th>Created</th>
+                    <th>Updated</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>2024-03-16</td>
-                    <td>PAY-001</td>
-                    <td>John Doe</td>
-                    <td>Credit Card</td>
-                    <td>$1,000.00</td>
-                    <td>INV-001</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-action view" title="View">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn-action edit" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-action delete" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2024-03-15</td>
-                    <td>PAY-002</td>
-                    <td>Jane Smith</td>
-                    <td>Bank Transfer</td>
-                    <td>$2,500.00</td>
-                    <td>INV-002</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-action view" title="View">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn-action edit" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-action delete" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
+
         </table>
     </div>
 
-    <!-- Add Payment Dialog -->
-    <div class="dialog-overlay" id="addPaymentDialog">
+    <!-- Add Payment In Dialog -->
+    <div class="dialog-overlay" id="addPaymentInDialog">
         <div class="dialog dialog-lg">
             <div class="dialog-header">
                 <h2>New Payment In</h2>
-                <button class="close-btn" onclick="closeAddPaymentDialog()">
+                <button class="close-btn" onclick="closeAddPaymentInDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
-                <form id="addPaymentForm" onsubmit="handleAddPayment(event)">
-                    <div class="form-row">
+                <form id="addPaymentInForm" onsubmit="handleAddPaymentIn(event)">
+                    <div class="form-grid">
                         <div class="form-group">
-                            <label for="customer">Customer</label>
-                            <select id="customer" required onchange="loadCustomerInvoices(this.value)">
+                            <label for="customer-name">Customer Name</label>
+                            <select name="customer-name" id="customer-name" required>
                                 <option value="">Select Customer</option>
-                                <option value="1">John Doe</option>
-                                <option value="2">Jane Smith</option>
+                                <option value="customer1">Customer 1</option>
+                                <option value="customer2">Customer 2</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="paymentDate">Payment Date</label>
-                            <input type="date" id="paymentDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="paymentNo">Payment No</label>
-                            <input type="text" id="paymentNo" readonly>
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Outstanding Invoices</label>
-                        <div class="invoice-items">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Invoice No</th>
-                                        <th>Date</th>
-                                        <th>Total Amount</th>
-                                        <th>Paid Amount</th>
-                                        <th>Balance</th>
-                                        <th>Pay Amount</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="invoiceItemsBody">
-                                    <tr>
-                                        <td>
-                                            <input type="text" class="invoice-no" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="date" class="invoice-date" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="total-amount" step="0.01" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="paid-amount" step="0.01" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="balance" step="0.01" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="pay-amount" step="0.01" onchange="calculateTotal()" min="0">
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn-danger" onclick="removeInvoiceItem(this)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="5" class="text-right"><strong>Total Payment Amount:</strong></td>
-                                        <td id="totalPayment">0.00</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
                         <div class="form-group">
-                            <label for="paymentMethod">Payment Method</label>
-                            <select id="paymentMethod" required>
-                                <option value="">Select Method</option>
-                                <option value="cash">Cash</option>
-                                <option value="credit_card">Credit Card</option>
-                                <option value="bank_transfer">Bank Transfer</option>
-                                <option value="cheque">Cheque</option>
+                            <label for="account-name">Account Name</label>
+                            <select name="account-name" id="account-name" required>
+                                <option value="">Select Account</option>
+                                <option value="account1">Account 1</option>
+                                <option value="account2">Account 2</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="accountNo">Account No</label>
-                            <input type="text" id="accountNo" placeholder="Card/Account number">
-                        </div>
-                        <div class="form-group">
-                            <label for="reference">Reference</label>
-                            <input type="text" id="reference" placeholder="Transaction reference">
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" rows="3"></textarea>
+                         <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <input type="number" id="amount" name="amount" min="0" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" rows="3"></textarea>
+                        </div>
+
                     </div>
 
                     <div class="dialog-actions">
-                        <button type="button" class="btn-secondary" onclick="closeAddPaymentDialog()">Cancel</button>
-                        <button type="submit" class="btn-primary">Create Payment</button>
+                        <button type="button" class="btn-secondary" onclick="closeAddPaymentInDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Payment In</button>
                     </div>
                 </form>
             </div>
@@ -188,193 +82,243 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dialog = document.getElementById('addPaymentDialog');
-    
-    window.openAddPaymentDialog = function() {
-        dialog.classList.add('active');
-        document.getElementById('paymentDate').valueAsDate = new Date();
-        generatePaymentNo();
-    };
-
-    window.closeAddPaymentDialog = function() {
-        dialog.classList.remove('active');
-        document.getElementById('addPaymentForm').reset();
-        document.getElementById('invoiceItemsBody').innerHTML = '';
-        addEmptyInvoiceRow();
-    };
-
-    window.generatePaymentNo = function() {
-        const date = new Date();
-        const year = date.getFullYear().toString().substr(-2);
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        document.getElementById('paymentNo').value = `PAY${year}${month}${random}`;
-    };
-
-    window.loadCustomerInvoices = function(customerId) {
-        // In a real application, you would fetch customer's outstanding invoices from the server
-        const tbody = document.getElementById('invoiceItemsBody');
-        tbody.innerHTML = '';
-
-        if (customerId === '1') {
-            addInvoiceItem({
-                invoiceNo: 'INV-001',
-                date: '2024-03-10',
-                totalAmount: 1500.00,
-                paidAmount: 500.00,
-                balance: 1000.00
-            });
-            addInvoiceItem({
-                invoiceNo: 'INV-002',
-                date: '2024-03-15',
-                totalAmount: 2000.00,
-                paidAmount: 0.00,
-                balance: 2000.00
-            });
-        } else if (customerId === '2') {
-            addInvoiceItem({
-                invoiceNo: 'INV-003',
-                date: '2024-03-12',
-                totalAmount: 3000.00,
-                paidAmount: 1500.00,
-                balance: 1500.00
-            });
+// Initialize payment in dialog functionality
+(function() {
+    // Make functions globally available immediately
+    window.openAddPaymentInDialog = function() {
+        console.log('Opening payment in dialog...');
+        const dialog = document.getElementById('addPaymentInDialog');
+        if (dialog) {
+            dialog.classList.add('active');
+        } else {
+            console.error('Payment In dialog element not found!');
         }
     };
 
-    window.addInvoiceItem = function(invoice) {
-        const tbody = document.getElementById('invoiceItemsBody');
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>
-                <input type="text" class="invoice-no" value="${invoice.invoiceNo}" readonly>
-            </td>
-            <td>
-                <input type="date" class="invoice-date" value="${invoice.date}" readonly>
-            </td>
-            <td>
-                <input type="number" class="total-amount" value="${invoice.totalAmount.toFixed(2)}" step="0.01" readonly>
-            </td>
-            <td>
-                <input type="number" class="paid-amount" value="${invoice.paidAmount.toFixed(2)}" step="0.01" readonly>
-            </td>
-            <td>
-                <input type="number" class="balance" value="${invoice.balance.toFixed(2)}" step="0.01" readonly>
-            </td>
-            <td>
-                <input type="number" class="pay-amount" step="0.01" onchange="calculateTotal()" min="0" max="${invoice.balance.toFixed(2)}">
-            </td>
-            <td>
-                <button type="button" class="btn-danger" onclick="removeInvoiceItem(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    };
-
-    window.addEmptyInvoiceRow = function() {
-        const tbody = document.getElementById('invoiceItemsBody');
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>
-                <input type="text" class="invoice-no" readonly>
-            </td>
-            <td>
-                <input type="date" class="invoice-date" readonly>
-            </td>
-            <td>
-                <input type="number" class="total-amount" step="0.01" readonly>
-            </td>
-            <td>
-                <input type="number" class="paid-amount" step="0.01" readonly>
-            </td>
-            <td>
-                <input type="number" class="balance" step="0.01" readonly>
-            </td>
-            <td>
-                <input type="number" class="pay-amount" step="0.01" onchange="calculateTotal()" min="0">
-            </td>
-            <td>
-                <button type="button" class="btn-danger" onclick="removeInvoiceItem(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    };
-
-    window.removeInvoiceItem = function(button) {
-        const tbody = document.getElementById('invoiceItemsBody');
-        if (tbody.children.length > 1) {
-            button.closest('tr').remove();
+    window.closeAddPaymentInDialog = function() {
+        console.log('Closing payment in dialog...');
+        const dialog = document.getElementById('addPaymentInDialog');
+        if (dialog) {
+            dialog.classList.remove('active');
+            const form = document.getElementById('addPaymentInForm');
+            if (form) form.reset();
         }
-        calculateTotal();
     };
 
-    window.calculateTotal = function() {
-        const payAmounts = Array.from(document.querySelectorAll('.pay-amount'))
-            .map(input => parseFloat(input.value) || 0);
-        
-        const total = payAmounts.reduce((sum, amount) => sum + amount, 0);
-        document.getElementById('totalPayment').textContent = total.toFixed(2);
-    };
-
-    window.handleAddPayment = function(event) {
+    window.handleAddPaymentIn = function(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        // Add your logic to save the payment
-        closeAddPaymentDialog();
+        // Add your logic to save the payment in
+        console.log('Saving Payment In...', Object.fromEntries(formData.entries()));
+        closeAddPaymentInDialog();
     };
 
-    // Close dialog when clicking outside
-    dialog.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeAddPaymentDialog();
+    // Set up click-outside handler when the dialog is available
+    function setupDialogHandlers() {
+        const dialog = document.getElementById('addPaymentInDialog');
+        if (dialog) {
+            dialog.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAddPaymentInDialog();
+                }
+            });
         }
-    });
+    }
 
-    // Initialize with one empty row
-    addEmptyInvoiceRow();
-});
+    // Try to set up handlers immediately
+    setupDialogHandlers();
+
+    // Also set up handlers when DOM is ready (in case script loads before content)
+    document.addEventListener('DOMContentLoaded', setupDialogHandlers);
+})();
 </script>
 
 <style>
-.invoice-items {
-    margin-top: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 15px;
+.product-container {
+    padding: 20px;
 }
 
 .dialog-lg {
     max-width: 1000px;
 }
 
-.invoice-no {
-    width: 120px;
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 20px; /* Gap between grid items */
+    margin-bottom: 20px;
 }
 
-.total-amount,
-.paid-amount,
-.balance,
-.pay-amount {
-    width: 120px;
+.form-group {
+    margin-bottom: 0; /* Remove default margin, use grid gap */
 }
 
-.text-right {
-    text-align: right;
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-weight: 500;
+    font-size: 14px;
 }
 
-.btn-danger {
-    color: #dc2626;
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.form-group input[readonly] {
+    background-color: #F3F4F6;
+    cursor: not-allowed;
+}
+
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #2563EB;
+}
+
+.btn-secondary:hover {
+    background-color: #E5E7EB;
+}
+
+.dialog-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dialog-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #111827;
+}
+
+.close-btn {
     background: none;
     border: none;
+    color: #6B7280;
     cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
 }
 
-.btn-danger:hover {
-    color: #991b1b;
+.close-btn:hover {
+    background-color: #F3F4F6;
+    color: #374151;
 }
+
+.dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.dialog-overlay.active {
+    display: flex;
+}
+
+.dialog {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+}
+
+.dialog-content {
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto; /* Add scrolling for long forms */
+}
+
+/* Styles for the table */
+.table-container {
+    overflow-x: auto; /* Add horizontal scrolling if table overflows */
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    /* table-layout: fixed; */ /* Use auto layout */
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #E5E7EB;
+    white-space: nowrap; /* Prevent text wrapping in cells */
+}
+
+.data-table th {
+    background-color: #F9FAFB;
+    color: #374151;
+    font-weight: normal; /* Set font-weight to normal */
+    text-transform: none; /* Remove uppercase */
+    font-size: 12px; /* Slightly reduce font size for headers */
+}
+
+.data-table td {
+    color: #4B5563;
+    font-size: 14px;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: #F3F4F6;
+}
+
+/* Note: Adjust column widths as needed */
 </style> 

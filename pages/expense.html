@@ -1,116 +1,83 @@
-<div class="expense-container">
+<div class="product-container">
     <div class="page-header">
         <h1>Expenses</h1>
         <div class="header-actions">
             <button class="btn-primary" onclick="openAddExpenseDialog()">
-                <i class="fas fa-plus"></i> New Expense
+                <i class="fas fa-plus"></i> Add Expense
+            </button>
+            <button class="btn-success">
+                <i class="fas fa-file-import"></i> Import Expenses
             </button>
         </div>
     </div>
 
-    <div class="expense-content">
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Reference</th>
-                        <th>Category</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Payment Method</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="expenseTableBody">
-                    <tr>
-                        <td>2024-02-25</td>
-                        <td>EXP-2024-001</td>
-                        <td>Office Supplies</td>
-                        <td>Monthly office supplies</td>
-                        <td class="text-right">$450.00</td>
-                        <td>Cash</td>
-                        <td><span class="badge badge-success">Paid</span></td>
-                        <td>
-                            <div class="action-dropdown">
-                                <button class="btn-icon" onclick="toggleActionMenu(this)">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <div class="action-menu">
-                                    <button onclick="viewExpenseDetails('EXP-2024-001')">
-                                        <i class="fas fa-eye"></i> View
-                                    </button>
-                                    <button onclick="editExpense('EXP-2024-001')">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
-                                    <button onclick="deleteExpense('EXP-2024-001')">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Expense ID</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Account</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+        </table>
     </div>
 
-    <!-- Add/Edit Expense Dialog -->
-    <div class="dialog-overlay" id="expenseDialog">
-        <div class="dialog">
+    <!-- Add Expense Dialog -->
+    <div class="dialog-overlay" id="addExpenseDialog">
+        <div class="dialog dialog-lg">
             <div class="dialog-header">
-                <h2 id="dialogTitle">New Expense</h2>
-                <button class="close-btn" onclick="closeExpenseDialog()">
+                <h2>New Expense</h2>
+                <button class="close-btn" onclick="closeAddExpenseDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
-                <form id="expenseForm" onsubmit="handleExpenseSubmit(event)">
-                    <input type="hidden" id="expenseAction" value="add">
-                    <div class="form-row">
+                <form id="addExpenseForm" onsubmit="handleAddExpense(event)">
+                    <div class="form-grid">
                         <div class="form-group">
-                            <label for="expenseDate">Date</label>
-                            <input type="date" id="expenseDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="expenseReference">Reference</label>
-                            <input type="text" id="expenseReference" readonly>
-                            <small class="text-muted">Auto-generated</small>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="exp_cat_id">Category</label>
-                            <select id="exp_cat_id" required>
+                            <label for="exp-cat">Expense Category</label>
+                            <select name="exp-cat" id="exp-cat" required>
                                 <option value="">Select Category</option>
-                                <!-- Categories will be loaded dynamically from database -->
+                                <option value="rent">Rent</option>
+                                <option value="utilities">Utilities</option>
+                                <option value="salaries">Salaries</option>
+                                <option value="supplies">Supplies</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
+
+                        <div class="form-group">
+                            <label for="account">Account</label>
+                            <select name="account" id="account" required>
+                                <option value="">Select Account</option>
+                                <option value="cash">Cash</option>
+                                <option value="bank1">Bank Account 1</option>
+                                <option value="bank2">Bank Account 2</option>
+                                <!-- Add account options dynamically -->
+                            </select>
+                        </div>
+
                         <div class="form-group">
                             <label for="amount">Amount</label>
-                            <input type="number" id="amount" step="0.01" required>
+                            <input type="number" id="amount" name="amount" min="0" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" rows="3" required></textarea>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="account_id">Account</label>
-                        <select id="account_id" required>
-                            <option value="">Select Account</option>
-                            <!-- Accounts will be loaded dynamically from database -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="expenseAttachment">Attachment</label>
-                        <input type="file" id="expenseAttachment">
-                        <small class="text-muted">Upload receipt or invoice (optional)</small>
-                    </div>
+
                     <div class="dialog-actions">
-                        <button type="button" class="btn-secondary" onclick="closeExpenseDialog()">Cancel</button>
-                        <button type="submit" class="btn-primary" id="submitButton">Save Expense</button>
+                        <button type="button" class="btn-secondary" onclick="closeAddExpenseDialog()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Expense</button>
                     </div>
                 </form>
             </div>
@@ -119,236 +86,244 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const expenseDialog = document.getElementById('expenseDialog');
-    
+// Initialize expense dialog functionality
+(function() {
+    // Make functions globally available immediately
     window.openAddExpenseDialog = function() {
-        document.getElementById('dialogTitle').textContent = 'New Expense';
-        document.getElementById('expenseAction').value = 'add';
-        document.getElementById('expenseReference').value = generateExpenseReference();
-        document.getElementById('expenseDate').valueAsDate = new Date();
-        document.getElementById('submitButton').textContent = 'Save Expense';
-        document.getElementById('expenseForm').reset();
-        expenseDialog.classList.add('active');
-    };
-
-    window.editExpense = function(expenseId) {
-        document.getElementById('dialogTitle').textContent = 'Edit Expense';
-        document.getElementById('expenseAction').value = 'edit';
-        document.getElementById('submitButton').textContent = 'Update Expense';
-
-        const row = document.querySelector(`tr[data-expense-id="${expenseId}"]`);
-        if (row) {
-            document.getElementById('expenseReference').value = expenseId;
-            document.getElementById('expenseDate').value = row.cells[0].textContent;
-            document.getElementById('exp_cat_id').value = row.cells[2].textContent.toLowerCase();
-            document.getElementById('description').value = row.cells[3].textContent;
-            document.getElementById('amount').value = row.cells[4].textContent.replace('$', '');
-            document.getElementById('account_id').value = row.cells[5].textContent.toLowerCase();
-        }
-        expenseDialog.classList.add('active');
-    };
-
-    window.closeExpenseDialog = function() {
-        expenseDialog.classList.remove('active');
-        document.getElementById('expenseForm').reset();
-    };
-
-    window.handleExpenseSubmit = function(event) {
-        event.preventDefault();
-        const action = document.getElementById('expenseAction').value;
-        const formData = {
-            date: document.getElementById('expenseDate').value,
-            reference: document.getElementById('expenseReference').value,
-            category: document.getElementById('exp_cat_id').value,
-            description: document.getElementById('description').value,
-            amount: document.getElementById('amount').value,
-            paymentMethod: document.getElementById('account_id').value,
-            paymentAccount: document.getElementById('account_id').value
-        };
-
-        if (action === 'add') {
-            addExpenseToTable(formData);
+        console.log('Opening expense dialog...');
+        const dialog = document.getElementById('addExpenseDialog');
+        if (dialog) {
+            dialog.classList.add('active');
         } else {
-            updateExpenseInTable(formData);
+            console.error('Expense dialog element not found!');
         }
-        closeExpenseDialog();
     };
 
-    window.generateExpenseReference = function() {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        return `EXP-${year}-${month}${random}`;
+    window.closeAddExpenseDialog = function() {
+        console.log('Closing expense dialog...');
+        const dialog = document.getElementById('addExpenseDialog');
+        if (dialog) {
+            dialog.classList.remove('active');
+            const form = document.getElementById('addExpenseForm');
+            if (form) form.reset();
+        }
     };
 
-    function addExpenseToTable(formData) {
-        const tbody = document.getElementById('expenseTableBody');
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-expense-id', formData.reference);
-        tr.innerHTML = `
-            <td>${formData.date}</td>
-            <td>${formData.reference}</td>
-            <td>${formData.category}</td>
-            <td>${formData.description}</td>
-            <td class="text-right">$${parseFloat(formData.amount).toFixed(2)}</td>
-            <td>${formData.paymentMethod}</td>
-            <td><span class="badge badge-success">Paid</span></td>
-            <td>
-                <div class="action-dropdown">
-                    <button class="btn-icon" onclick="toggleActionMenu(this)">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    <div class="action-menu">
-                        <button onclick="viewExpenseDetails('${formData.reference}')">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                        <button onclick="editExpense('${formData.reference}')">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button onclick="deleteExpense('${formData.reference}')">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
-                </div>
-            </td>
-        `;
-        tbody.insertBefore(tr, tbody.firstChild);
-    }
+    window.handleAddExpense = function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Add your logic to save the expense
+        console.log('Saving Expense...', Object.fromEntries(formData.entries()));
+        closeAddExpenseDialog();
+    };
 
-    function updateExpenseInTable(formData) {
-        const row = document.querySelector(`tr[data-expense-id="${formData.reference}"]`);
-        if (row) {
-            row.cells[0].textContent = formData.date;
-            row.cells[2].textContent = formData.category;
-            row.cells[3].textContent = formData.description;
-            row.cells[4].textContent = `$${parseFloat(formData.amount).toFixed(2)}`;
-            row.cells[5].textContent = formData.paymentMethod;
-        }
-    }
-
-    // Close dialog when clicking outside
-    expenseDialog.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeExpenseDialog();
-        }
-    });
-
-    // Close action menus when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.action-dropdown')) {
-            document.querySelectorAll('.action-menu.active').forEach(menu => {
-                menu.classList.remove('active');
+    // Set up click-outside handler when the dialog is available
+    function setupDialogHandlers() {
+        const dialog = document.getElementById('addExpenseDialog');
+        if (dialog) {
+            dialog.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAddExpenseDialog();
+                }
             });
         }
-    });
-
-    // Add these functions to load data from database
-    function loadExpenseCategories() {
-        // This would typically be an AJAX call to your backend
-        fetch('/api/expense-categories')
-            .then(response => response.json())
-            .then(categories => {
-                const categorySelect = document.getElementById('exp_cat_id');
-                categorySelect.innerHTML = '<option value="">Select Category</option>';
-                categories.forEach(category => {
-                    categorySelect.innerHTML += `<option value="${category.exp_cat_id}">${category.exp_cat_name}</option>`;
-                });
-            });
     }
 
-    function loadAccounts() {
-        // This would typically be an AJAX call to your backend
-        fetch('/api/accounts')
-            .then(response => response.json())
-            .then(accounts => {
-                const accountSelect = document.getElementById('account_id');
-                accountSelect.innerHTML = '<option value="">Select Account</option>';
-                accounts.forEach(account => {
-                    accountSelect.innerHTML += `<option value="${account.id}">${account.account_name}</option>`;
-                });
-            });
-    }
+    // Try to set up handlers immediately
+    setupDialogHandlers();
 
-    // Call load functions when page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        loadExpenseCategories();
-        loadAccounts();
-    });
-});
+    // Also set up handlers when DOM is ready (in case script loads before content)
+    document.addEventListener('DOMContentLoaded', setupDialogHandlers);
+})();
 </script>
 
 <style>
-.expense-container {
+/* Reusing styles from previous pages */
+.product-container {
     padding: 20px;
 }
 
-.expense-content {
-    background: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.dialog-lg {
+    max-width: 1000px;
 }
 
-.form-row {
+.form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 20px; /* Gap between grid items */
     margin-bottom: 20px;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 0; /* Remove default margin, use grid gap */
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
+    margin-bottom: 8px;
     color: #374151;
+    font-weight: 500;
+    font-size: 14px;
 }
 
-.form-group input,
+.form-group input[type="text"],
+.form-group input[type="number"],
 .form-group select,
 .form-group textarea {
     width: 100%;
     padding: 8px 12px;
     border: 1px solid #D1D5DB;
-    border-radius: 4px;
-    font-size: 0.9em;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
 }
 
-.form-group textarea {
-    resize: vertical;
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
-.text-muted {
+.form-group input[readonly] {
+    background-color: #F3F4F6;
+    cursor: not-allowed;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #2563EB;
+}
+
+.btn-secondary:hover {
+    background-color: #E5E7EB;
+}
+
+.dialog-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dialog-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #111827;
+}
+
+.close-btn {
+    background: none;
+    border: none;
     color: #6B7280;
-    font-size: 0.875rem;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.badge {
-    padding: 4px 8px;
+    cursor: pointer;
+    padding: 4px;
     border-radius: 4px;
-    font-size: 0.875rem;
+    transition: all 0.2s;
 }
 
-.badge-success {
-    background-color: #D1FAE5;
-    color: #065F46;
+.close-btn:hover {
+    background-color: #F3F4F6;
+    color: #374151;
 }
 
-.badge-danger {
-    background-color: #FEE2E2;
-    color: #991B1B;
+.dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.dialog-overlay.active {
+    display: flex;
 }
 
 .dialog {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 90%;
     max-width: 600px;
+}
+
+.dialog-lg {
+    max-width: 1000px;
+}
+
+.dialog-content {
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Styles for the table */
+.table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #E5E7EB;
+    white-space: nowrap;
+}
+
+.data-table th {
+    background-color: #F9FAFB;
+    color: #374151;
+    font-weight: normal;
+    text-transform: none;
+    font-size: 12px;
+}
+
+.data-table td {
+    color: #4B5563;
+    font-size: 14px;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: #F3F4F6;
 }
 </style> 
