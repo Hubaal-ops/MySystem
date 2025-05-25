@@ -15,32 +15,15 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Product Type</th>
-                    <th>Category</th>
-                    <th>Brand</th>
-                    <th>Sales Price</th>
-                    <th>Purchase Price</th>
-                    <th>Current Stock</th>
+                    <th>Product ID</th>
+                    <th>Category ID</th>
+                    <th>Product Name</th>
+                    <th>Storing Balance</th>
+                    <th>Created</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Example Product</td>
-                    <td>Type A</td>
-                    <td>Category 1</td>
-                    <td>Brand X</td>
-                    <td>$100</td>
-                    <td>$50</td>
-                    <td>200</td>
-                    <td>
-                        <button class="btn-action">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
+            
         </table>
     </div>
 
@@ -57,80 +40,24 @@
                 <form id="addProductForm" onsubmit="handleAddProduct(event)">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="productName">Product Name</label>
-                            <input type="text" id="productName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="productType">Product Type</label>
-                            <select id="productType" required>
-                                <option value="">Select Type</option>
-                                <option value="physical">Physical</option>
-                                <option value="digital">Digital</option>
-                                <option value="service">Service</option>
+                            <label for="catname">Category Name</label>
+                            <select name="Category" id="catname">
+                                <option value="select">Select Category</option>
+                                <option value="cat1">Category 1</option>
+                                <option value="cat2">Category 2</option>
                             </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="productType">Product Name</label>
+                            <input type="text" id="productname" required>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="category">Category</label>
-                            <select id="category" required>
-                                <option value="">Select Category</option>
-                                <option value="1">Category 1</option>
-                                <option value="2">Category 2</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="brand">Brand</label>
-                            <select id="brand" required>
-                                <option value="">Select Brand</option>
-                                <option value="1">Brand 1</option>
-                                <option value="2">Brand 2</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="sku">SKU</label>
-                            <input type="text" id="sku" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="barcode">Barcode</label>
-                            <input type="text" id="barcode">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="salesPrice">Sales Price</label>
-                            <input type="number" id="salesPrice" step="0.01" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="purchasePrice">Purchase Price</label>
-                            <input type="number" id="purchasePrice" step="0.01" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="minStock">Minimum Stock</label>
-                            <input type="number" id="minStock" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label for="openingStock">Opening Stock</label>
-                            <input type="number" id="openingStock" min="0" value="0">
-                        </div>
-                    </div>
-
+                
                     <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" rows="3"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="productImage">Product Image</label>
-                        <input type="file" id="productImage" accept="image/*">
+                        <label for="description">Storing Balance</label>
+                        <input type="number" id="storingBalance" required>
                     </div>
 
                     <div class="dialog-actions">

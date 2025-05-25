@@ -29,7 +29,7 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="submenu" id="parties">
-                <a href="#customer"><i class="fas fa-user"></i> Customer</a>
+                <a href="#customers"><i class="fas fa-user"></i> Customer</a>
                 <a href="#supplier"><i class="fas fa-user-tie"></i> Supplier</a>
             </div>
 
@@ -38,11 +38,10 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="submenu" id="products">
-                <a href="#product"><i class="fas fa-tag"></i> Brands</a>
                 <a href="#categories"><i class="fas fa-list"></i> Categories</a>
                 <a href="#products"><i class="fas fa-boxes"></i> Products</a>
                 <a href="#stores"><i class="fas fa-boxes"></i> Stores</a>
-                <a href="#store-details"><i class="fas fa-boxes"></i> Store Details</a>
+                <a href="#store-product"><i class="fas fa-boxes"></i> Store Details</a>
             </div>
 
             <div class="menu-item" data-submenu="sales">
@@ -62,7 +61,7 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="submenu" id="purchases">
-                <a href="#purchase"><i class="fas fa-list"></i> Purchases</a>
+                <a href="#purchases"><i class="fas fa-list"></i> Purchases</a>
                 <a href="#purchase-return"><i class="fas fa-undo"></i> Purchase Return</a>
                 <a href="#payment-out"><i class="fas fa-money-bill-wave"></i> Payment Out</a>
             </div>
@@ -260,83 +259,54 @@
                     case 'invoice-templates':
                         url = 'pages/invoice-templates.html';
                         break;
+                    case 'stores':
+                        url = 'pages/stores.html';
+                        break;
                     default:
                         url = `pages/${page}.html`;
                 }
                 
                 const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Page not found: ${url}`);
-                }
                 const content = await response.text();
-                document.getElementById('mainContent').innerHTML = content;
                 
-                // Initialize dialogs after content is loaded
+                // Create a temporary div to parse the HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                
+                // Extract scripts before removing them
+                const scripts = tempDiv.getElementsByTagName('script');
+                const scriptsArray = Array.from(scripts);
+                
+                // Remove scripts from the content before inserting
+                scriptsArray.forEach(script => script.remove());
+                
+                // Insert the content without scripts
+                document.getElementById('mainContent').innerHTML = tempDiv.innerHTML;
+                
+                // Execute each script in sequence
+                for (const script of scriptsArray) {
+                    const newScript = document.createElement('script');
+                    if (script.src) {
+                        // For external scripts, load them asynchronously
+                        await new Promise((resolve, reject) => {
+                            newScript.src = script.src;
+                            newScript.onload = resolve;
+                            newScript.onerror = reject;
+                            document.body.appendChild(newScript);
+                        });
+                    } else {
+                        // For inline scripts, execute them immediately
+                        newScript.textContent = script.textContent;
+                        document.body.appendChild(newScript);
+                    }
+                }
+
+                // Initialize any dialogs after content is loaded
                 initializeDialogs();
-                
-                // Initialize report tabs if this is a report page
-                if (page.startsWith('report-')) {
-                    initializeReportTabs();
-                }
-                
-                // Initialize specific report charts based on the page
-                switch(page) {
-                    case 'report-dashboard':
-                        initializeDashboardCharts();
-                        break;
-                    case 'report-sales':
-                        initializeSalesCharts();
-                        break;
-                    case 'report-inventory':
-                        initializeInventoryCharts();
-                        break;
-                    case 'report-financial':
-                        initializeFinancialCharts();
-                        break;
-                    case 'report-expense':
-                        initializeExpenseCharts();
-                        break;
-                    case 'report-profit-loss':
-                        initializeProfitLossCharts();
-                        break;
-                    case 'report-balance':
-                        initializeBalanceSheetCharts();
-                        break;
-                    case 'report-customer':
-                        initializeCustomerReportCharts();
-                        break;
-                    case 'report-vendor':
-                        initializeVendorCharts();
-                        break;
-                    case 'report-invoice':
-                        initializeInvoiceCharts();
-                        break;
-                    case 'report-employee':
-                        initializeEmployeeReportCharts();
-                        break;
-                    case 'report-audit':
-                        initializeAuditCharts();
-                        break;
-                }
-                
-                // Update active menu item
-                updateActiveMenuItem(page);
-                
-                // Initialize main dashboard charts
-                if (page === 'dashboard') {
-                    initializeMainDashboardCharts();
-                }
-                
+
             } catch (error) {
-                console.error('Error loading page:', error);
-                document.getElementById('mainContent').innerHTML = `
-                    <div class="error-message">
-                        <h2>Error Loading Content</h2>
-                        <p>${error.message}</p>
-                        <button onclick="loadContent('${page}')" class="btn-primary">
-                            <i class="fas fa-redo"></i> Retry
-                        </button>
-                    </div>`;
+                console.error('Error loading content:', error);
+                document.getElementById('mainContent').innerHTML = '<div class="error">Error loading content</div>';
             }
         }
 

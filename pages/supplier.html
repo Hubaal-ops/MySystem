@@ -1,12 +1,12 @@
-<div class="supplier-container">
+<div class="customer-container">
     <div class="page-header">
-        <h1>Suppliers</h1>
+        <h1>Customers</h1>
         <div class="header-actions">
-            <button class="btn-primary" onclick="openAddSupplierDialog()">
-                <i class="fas fa-plus"></i> Add Supplier
+            <button class="btn-primary" onclick="openAddCustomerDialog()">
+                <i class="fas fa-plus"></i> Add Customer
             </button>
             <button class="btn-success">
-                <i class="fas fa-file-import"></i> Import Suppliers
+                <i class="fas fa-file-import"></i> Import Customers
             </button>
         </div>
     </div>
@@ -15,45 +15,44 @@
         <table class="data-table">
             <thead>
                 <tr>
+                    <th>Supplier ID</th>
                     <th>Supplier Name</th>
-                    <th>Contact Person</th>
                     <th>Phone</th>
                     <th>Email</th>
-                    <th>Products Supplied</th>
-                    <th>Outstanding Balance</th>
-                    <th>Status</th>
+                    <th>Balance</th>
+                    <th>Created</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="supplierTableBody">
-                <!-- Supplier rows will be loaded dynamically -->
+            <tbody id="customerTableBody">
+                <!-- Customer rows will be loaded dynamically -->
             </tbody>
         </table>
     </div>
 
-    <!-- Add Supplier Dialog -->
-    <div class="dialog-overlay" id="addSupplierDialog">
+    <!-- Add Customer Dialog -->
+    <div class="dialog-overlay" id="addCustomerDialog">
         <div class="dialog dialog-lg">
             <div class="dialog-header">
                 <h2>New Supplier</h2>
-                <button class="close-btn" onclick="closeAddSupplierDialog()">
+                <button class="close-btn" onclick="closeAddCustomerDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
-                <form id="addSupplierForm" onsubmit="handleAddSupplier(event)">
-                    <h3>Supplier Information</h3>
+                <form id="addCustomerForm" onsubmit="handleAddCustomer(event)">
+                    <h3>Personal Information</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="sup_name">Supplier Name</label>
-                            <input type="text" id="sup_name" required>
+                            <label for="cus_name">Supplier Name</label>
+                            <input type="text" id="cus_name" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="sup_tel">Phone</label>
-                            <input type="tel" id="sup_tel" required>
+                            <label for="cust_tel">Phone</label>
+                            <input type="tel" id="cust_tel" required>
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
@@ -63,83 +62,14 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="bal">Initial Balance</label>
+                            <label for="bal"> Balance</label>
                             <input type="number" id="bal" step="0.01" value="0.00" required>
                         </div>
                     </div>
 
-                    <h3>Address</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="address">Street Address</label>
-                            <input type="text" id="address" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="city">City</label>
-                            <input type="text" id="city" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="state">State/Province</label>
-                            <input type="text" id="state">
-                        </div>
-                        <div class="form-group">
-                            <label for="postalCode">Postal Code</label>
-                            <input type="text" id="postalCode">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="country">Country</label>
-                            <select id="country" required>
-                                <option value="">Select Country</option>
-                                <option value="US">United States</option>
-                                <option value="UK">United Kingdom</option>
-                                <option value="CA">Canada</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <select id="status" required>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <h3>Payment Information</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="bankName">Bank Name</label>
-                            <input type="text" id="bankName">
-                        </div>
-                        <div class="form-group">
-                            <label for="accountNo">Account No</label>
-                            <input type="text" id="accountNo">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="creditLimit">Credit Limit</label>
-                            <input type="number" id="creditLimit" min="0" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="paymentTerms">Payment Terms (Days)</label>
-                            <input type="number" id="paymentTerms" min="0">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" rows="3"></textarea>
-                    </div>
-
+                
                     <div class="dialog-actions">
-                        <button type="button" class="btn-secondary" onclick="closeAddSupplierDialog()">Cancel</button>
+                        <button type="button" class="btn-secondary" onclick="closeAddCustomerDialog()">Cancel</button>
                         <button type="submit" class="btn-primary">Save Supplier</button>
                     </div>
                 </form>
@@ -150,67 +80,58 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const dialog = document.getElementById('addSupplierDialog');
+    const dialog = document.getElementById('addCustomerDialog');
     
-    window.openAddSupplierDialog = function() {
+    window.openAddCustomerDialog = function() {
         dialog.classList.add('active');
     };
 
-    window.closeAddSupplierDialog = function() {
+    window.closeAddCustomerDialog = function() {
         dialog.classList.remove('active');
-        document.getElementById('addSupplierForm').reset();
+        document.getElementById('addCustomerForm').reset();
     };
 
-    window.handleAddSupplier = function(event) {
+    window.handleAddCustomer = function(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        // Add your logic to save the supplier
-        closeAddSupplierDialog();
+        // Add your logic to save the customer
+        closeAddCustomerDialog();
     };
 
-    window.viewSupplierDetails = function(supplierId) {
-        // Load supplier details page with the specific supplier ID
-        window.parent.loadContent('supplier-detail', supplierId);
+    window.viewCustomerDetails = function(customerId) {
+        // Load customer details page with the specific customer ID
+        window.parent.loadContent('customer-detail', customerId);
     };
 
-    // Load sample supplier data
-    const sampleSuppliers = [
+    // Load sample customer data
+    const sampleCustomers = [
         {
             id: 1,
-            name: 'Tech Supplies Inc',
-            contactPerson: 'Jane Smith',
+            name: 'John Doe',
             phone: '+1234567890',
-            email: 'jane@techsupplies.com',
-            productsSupplied: 'Electronics, Accessories',
-            balance: '$5,200',
+            email: 'john@example.com',
+            address: '123 Main St',
+            totalPurchases: '$1,500',
+            balance: '$200',
             status: 'Active'
         },
-        {
-            id: 2,
-            name: 'Global Imports Ltd',
-            contactPerson: 'Mike Johnson',
-            phone: '+0987654321',
-            email: 'mike@globalimports.com',
-            productsSupplied: 'Clothing, Textiles',
-            balance: '$3,800',
-            status: 'Active'
-        }
+        // Add more sample customers as needed
     ];
 
     // Populate table with sample data
-    const tbody = document.getElementById('supplierTableBody');
-    sampleSuppliers.forEach(supplier => {
+    const tbody = document.getElementById('customerTableBody');
+    sampleCustomers.forEach(customer => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${supplier.name}</td>
-            <td>${supplier.contactPerson}</td>
-            <td>${supplier.phone}</td>
-            <td>${supplier.email}</td>
-            <td>${supplier.productsSupplied}</td>
-            <td>${supplier.balance}</td>
-            <td><span class="badge badge-active">${supplier.status}</span></td>
+            <td>${customer.name}</td>
+            <td>${customer.phone}</td>
+            <td>${customer.email}</td>
+            <td>${customer.address}</td>
+            <td>${customer.totalPurchases}</td>
+            <td>${customer.balance}</td>
+            <td><span class="badge badge-active">${customer.status}</span></td>
             <td>
-                <button class="btn-action" onclick="viewSupplierDetails(${supplier.id})">
+                <button class="btn-action" onclick="viewCustomerDetails(${customer.id})">
                     <i class="fas fa-eye"></i>
                 </button>
             </td>
@@ -221,14 +142,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close dialog when clicking outside
     dialog.addEventListener('click', function(e) {
         if (e.target === this) {
-            closeAddSupplierDialog();
+            closeAddCustomerDialog();
         }
     });
 });
 </script>
 
 <style>
-.supplier-container {
+.customer-container {
     padding: 20px;
 }
 
@@ -256,7 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="tel"],
-.form-group input[type="url"],
 .form-group input[type="number"],
 .form-group select,
 .form-group textarea {

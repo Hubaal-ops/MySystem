@@ -1,12 +1,12 @@
 <div class="product-container">
     <div class="page-header">
-        <h1>Stores</h1>
+        <h1>Store Products</h1>
         <div class="header-actions">
             <button class="btn-primary" onclick="openAddStoreDialog()">
-                <i class="fas fa-plus"></i> Add Store
+                <i class="fas fa-plus"></i> Add store
             </button>
             <button class="btn-success">
-                <i class="fas fa-file-import"></i> Import Store
+                <i class="fas fa-file-import"></i> Import Store Product
             </button>
         </div>
     </div>
@@ -15,10 +15,10 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Store ID</th>
+                    <th>Store Product ID</th>
                     <th>Store Name </th>
-                    <th>Location </th>
-                    <th> Manager</th>
+                    <th>Product Name  </th>
+                    <th>Quantity</th>
                     <th>Created</th>
                     <th>Action</th>
                 </tr>
@@ -31,7 +31,7 @@
     <div class="dialog-overlay" id="addStoreDialog">
         <div class="dialog dialog-lg">
             <div class="dialog-header">
-                <h2>New Product</h2>
+                <h2>New Store-Product</h2>
                 <button class="close-btn" onclick="closeAddStoreDialog()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -41,20 +41,28 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="storeName">Store Name</label>
-                            <input type="text" id="storeName" name="storeName" required>
+                            <select name="storeName" id="storeName">
+                                <option value="select">Select Store</option>
+                                <option value="store1">Store 1</option>
+                                <option value="store2">Store 2</option>
+                            </select>
                             
 
                         </div>
                         <div class="form-group">
-                            <label for="location">Location</label>
-                            <input type="text" id="location" name="location" required>
+                            <label for="product-name">Product Name</label>
+                            <select name="product-name" id="product-name">
+                                <option value="select">Select Product</option>
+                                <option value="product1">Product 1</option>
+                                <option value="product2">Product 2</option>
+                            </select>
                         </div>
                     </div>
 
                 
                     <div class="form-group">
-                        <label for="manager">Manager</label>
-                        <input type="number" id="manager" name="manager" required>
+                        <label for="Quantity">Quantity</label>
+                        <input type="number" id="Quantity" name="Quantity" required>
                     </div>
 
                     <div class="dialog-actions">
@@ -70,14 +78,12 @@
 <script>
 // Define functions in global scope
 window.openAddStoreDialog = function() {
-    console.log('Opening dialog...');
     const dialog = document.getElementById('addStoreDialog');
     dialog.classList.add('active');
-    console.log('Dialog classes:', dialog.classList);
 };
+    
 
 window.closeAddStoreDialog = function() {
-    console.log('Closing dialog...');
     const dialog = document.getElementById('addStoreDialog');
     dialog.classList.remove('active');
     document.getElementById('addStoreForm').reset();

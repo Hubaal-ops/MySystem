@@ -15,75 +15,59 @@
         <table class="data-table">
             <thead>
                 <tr>
+                    <th>Customer ID</th>
                     <th>Customer Name</th>
                     <th>Phone</th>
                     <th>Email</th>
-                    <th>Address</th>
-                    <th>Total Purchases</th>
                     <th>Balance</th>
-                    <th>Status</th>
+                    <th>Date</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>John Doe</td>
-                    <td>+1234567890</td>
-                    <td>john@example.com</td>
-                    <td>123 Main St</td>
-                    <td>$1,500</td>
-                    <td>$200</td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>
-                        <button class="btn-action">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </button>
-                    </td>
-                </tr>
+            <tbody id="customerTableBody">
+                <!-- Customer rows will be loaded dynamically -->
             </tbody>
         </table>
     </div>
 
     <!-- Add Customer Dialog -->
     <div class="dialog-overlay" id="addCustomerDialog">
-        <div class="dialog">
+        <div class="dialog dialog-lg">
             <div class="dialog-header">
-                <h2>Add New Customer</h2>
+                <h2>New Customer</h2>
                 <button class="close-btn" onclick="closeAddCustomerDialog()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="dialog-content">
                 <form id="addCustomerForm" onsubmit="handleAddCustomer(event)">
-                    <div class="form-group">
-                        <label for="customerName">Customer Name</label>
-                        <input type="text" id="customerName" required>
+                    <h3>Personal Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cus_name">Customer Name</label>
+                            <input type="text" id="cus_name" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" required>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cust_tel">Phone</label>
+                            <input type="tel" id="cust_tel" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bal"> Balance</label>
+                            <input type="number" id="bal" step="0.01" value="0.00" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="address">Address</label>
-                        <textarea id="address" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="customerType">Customer Type</label>
-                        <select id="customerType" required>
-                            <option value="">Select Type</option>
-                            <option value="retail">Retail</option>
-                            <option value="wholesale">Wholesale</option>
-                            <option value="corporate">Corporate</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="creditLimit">Credit Limit</label>
-                        <input type="number" id="creditLimit" min="0" step="0.01">
-                    </div>
+
+                
                     <div class="dialog-actions">
                         <button type="button" class="btn-secondary" onclick="closeAddCustomerDialog()">Cancel</button>
                         <button type="submit" class="btn-primary">Save Customer</button>
@@ -96,7 +80,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dialog functionality
     const dialog = document.getElementById('addCustomerDialog');
     
     window.openAddCustomerDialog = function() {
@@ -105,15 +88,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.closeAddCustomerDialog = function() {
         dialog.classList.remove('active');
+        document.getElementById('addCustomerForm').reset();
     };
 
     window.handleAddCustomer = function(event) {
         event.preventDefault();
-        // Handle form submission here
         const formData = new FormData(event.target);
         // Add your logic to save the customer
         closeAddCustomerDialog();
     };
+
+    window.viewCustomerDetails = function(customerId) {
+        // Load customer details page with the specific customer ID
+        window.parent.loadContent('customer-detail', customerId);
+    };
+
+    // Load sample customer data
+    const sampleCustomers = [
+        {
+            id: 1,
+            name: 'John Doe',
+            phone: '+1234567890',
+            email: 'john@example.com',
+            address: '123 Main St',
+            totalPurchases: '$1,500',
+            balance: '$200',
+            status: 'Active'
+        },
+        // Add more sample customers as needed
+    ];
+
+    // Populate table with sample data
+    const tbody = document.getElementById('customerTableBody');
+    sampleCustomers.forEach(customer => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${customer.name}</td>
+            <td>${customer.phone}</td>
+            <td>${customer.email}</td>
+            <td>${customer.address}</td>
+            <td>${customer.totalPurchases}</td>
+            <td>${customer.balance}</td>
+            <td><span class="badge badge-active">${customer.status}</span></td>
+            <td>
+                <button class="btn-action" onclick="viewCustomerDetails(${customer.id})">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
 
     // Close dialog when clicking outside
     dialog.addEventListener('click', function(e) {
@@ -122,4 +146,70 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script> 
+</script>
+
+<style>
+.customer-container {
+    padding: 20px;
+}
+
+.dialog-lg {
+    max-width: 1000px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+h3 {
+    margin: 20px 0 10px;
+    color: #374151;
+    font-size: 1.1em;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background: #6B7280;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #4B5563;
+}
+</style> 
