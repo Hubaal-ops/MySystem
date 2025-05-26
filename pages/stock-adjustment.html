@@ -15,12 +15,11 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Adjustment No</th>
-                    <th>Product No</th>
-                    <th>Store No</th>
+                    <th>Adjustment ID</th>
+                    <th>Product Name</th>
+                    <th>Store Name</th>
                     <th>Quantity</th>
                     <th>Adjustment Type</th>
-                    <th>Adjustment Date</th>
                     <th>Adjustment Description</th>
                     <th>Created At</th>
                     <th>Updated At</th>
@@ -43,7 +42,7 @@
                 <form id="addStockAdjustmentForm" onsubmit="handleAddStockAdjustment(event)">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="product-no">Product No</label>
+                            <label for="product-no">Product Name</label>
                             <select name="product-no" id="product-no" required>
                                 <option value="">Select Product</option>
                                 <option value="product1">Product X</option>
@@ -53,7 +52,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="store-no">Store No</label>
+                            <label for="store-no">Store Name</label>
                             <select name="store-no" id="store-no" required>
                                 <option value="">Select Store</option>
                                 <option value="store1">Store A</option>
@@ -76,11 +75,6 @@
                                 <option value="damage">Damage</option>
                                 <option value="expiry">Expiry</option>
                             </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="adj-date">Adjustment Date</label>
-                            <input type="date" id="adj-date" name="adj-date" required>
                         </div>
 
                         <div class="form-group">
